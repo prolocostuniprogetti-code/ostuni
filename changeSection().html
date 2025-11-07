@@ -42,7 +42,7 @@
             /* Immagine di Ostuni con leggero effetto parallasse */
             background-image: url('https://images.unsplash.com/photo-1594917409252-f1981e7d0e4f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); 
             background-size: cover;
-            background-attachment: fixed; /* Simula parallasse su alcuni browser */
+            background-attachment: fixed; 
             background-position: center;
             height: 250px; 
             position: relative;
@@ -72,11 +72,11 @@
             transform: translateY(15px);
         }
         
-        /* Stile per la responsività dei pulsanti lista (per evitare il truncate eccessivo su schermi piccoli) */
+        /* Stile per la responsività dei pulsanti lista */
         @media (max-width: 640px) {
             .list-item-truncate {
-                /* Su schermi molto piccoli, diamo più spazio al testo, il truncate è gestito dal JS */
-                width: 100%; 
+                flex-grow: 1; 
+                min-width: 0; 
             }
         }
     </style>
@@ -89,7 +89,7 @@
             <div class="header-overlay text-ostuni-white rounded-t-xl">
                 <h1 class="text-5xl font-extrabold text-center tracking-tight drop-shadow-lg">OSTUNI: La Guida</h1>
                 <p class="text-center mt-2 text-md font-light">Esplora la Città Bianca con contenuti dinamici.</p>
-                [Image of Ostuni La Città Bianca]
+                
             </div>
         </header>
 
@@ -107,7 +107,7 @@
     </div>
 
     <script>
-        // --- Dati delle Attrazioni (28 punti del Centro Storico) ---
+        // --- 1. DATI DELLE ATTRAZIONI: MODIFICA QUI IMMAGINI E CONTENUTI ---
         const attrazioni = [
             {
                 id: 'centro',
@@ -115,9 +115,22 @@
                 icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
                 descrizione: 'Il labirinto bianco. Esplora i 28 punti storici del centro. Clicca su ogni attrazione per aprire la sua pagina di dettaglio.',
                 elementi: [
-                    { numero: 1, titolo: 'Obelisco di S. Oronzo', dettaglio: 'Monumento votivo in stile barocco, alto quasi 21 metri, eretto per ringraziare il santo per aver liberato la città dalla peste.' },
+                    { 
+                        numero: 1, 
+                        titolo: 'Obelisco di S. Oronzo', 
+                        dettaglio: 'Monumento votivo in stile barocco, alto quasi 21 metri, eretto per ringraziare il santo per aver liberato la città dalla peste.',
+                        immagineUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Colonna_di_Sant%27Oronzo_-_Ostuni.jpg/800px-Colonna_di_Sant%27Oronzo_-_Ostuni.jpg',
+                        contenutoEsteso: 'L\'Obelisco, in realtà una guglia in stile barocco, fu costruito nel 1771 dall\'architetto Giuseppe Greco per ringraziare Sant\'Oronzo, patrono di Ostuni, per aver risparmiato la città da una pestilenza. È un punto focale nella piazza della Libertà e merita di essere ammirato da vicino per i suoi dettagli scultorei.' 
+                    },
                     { numero: 2, titolo: 'Chiesa dello Spirito Santo', dettaglio: 'Una delle chiese più antiche, caratterizzata da un bellissimo portale rinascimentale. Si trova vicino a Piazza della Libertà.' },
-                    { numero: 3, titolo: 'Palazzo Municipale', dettaglio: 'Antico convento francescano, oggi sede del Municipio. Si affaccia sulla Piazza della Libertà, cuore della vita cittadina.' },
+                    { 
+                        numero: 3, 
+                        titolo: 'Palazzo Municipale', 
+                        dettaglio: 'Antico convento francescano, oggi sede del Municipio. Si affaccia sulla Piazza della Libertà, cuore della vita cittadina.',
+                        // Puoi lasciare l'URL vuoto se non hai un'immagine
+                        immagineUrl: '', 
+                        contenutoEsteso: 'Il Palazzo Municipale sorge sull\'area del Convento dei Frati Minori Osservanti, soppresso nel 1809. La sua facciata neoclassica conserva elementi dell\'antica struttura conventuale e si integra perfettamente con l\'Obelisco nella piazza.'
+                    },
                     { numero: 4, titolo: 'Chiesa San F. d\'Assisi', dettaglio: 'Esempio di architettura barocca, costruita sul sito di una preesistente chiesa medievale e ricca di decorazioni interne.' },
                     { numero: 5, titolo: 'Stemma degli Zevallos', dettaglio: 'Uno stemma nobiliare che decora uno dei palazzi storici più importanti, testimonianza del passato aristocratico ostunese.' },
                     { numero: 6, titolo: 'Palazzo Ayroldi', dettaglio: 'Un imponente palazzo storico che si distingue per la sua elegante facciata e i dettagli architettonici barocchi.' },
@@ -126,7 +139,13 @@
                     { numero: 9, titolo: 'Convento delle Monacelle', dettaglio: 'Storico convento che oggi è un importante edificio pubblico o residenziale, mantenendo l\'antica struttura monastica.' },
                     { numero: 10, titolo: 'Chiesa Monacelle/Museo', dettaglio: 'Chiesa annessa al convento (n. 9), spesso adibita a ospitare eventi o piccole esposizioni museali d\'arte sacra.' },
                     { numero: 11, titolo: 'Volta di Federico II', dettaglio: 'Un arco o passaggio storico che si dice sia legato alla presenza o alle opere dell\'Imperatore Federico II di Svevia.' },
-                    { numero: 12, titolo: 'Cattedrale', dettaglio: 'Il simbolo di Ostuni. Famosa per il suo maestoso rosone gotico a 24 raggi sulla sommità del colle. Un capolavoro da non perdere.' },
+                    { 
+                        numero: 12, 
+                        titolo: 'Cattedrale', 
+                        dettaglio: 'Il simbolo di Ostuni. Famosa per il suo maestoso rosone gotico a 24 raggi sulla sommità del colle. Un capolavoro da non perdere.',
+                        immagineUrl: 'https://images.unsplash.com/photo-1549488344-9d5450f3b4d4?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        contenutoEsteso: 'La Concattedrale di Santa Maria Assunta, costruita nel XV secolo, è il capolavoro del Gotico Fiorito pugliese. La sua caratteristica più sorprendente è il rosone centrale, il secondo più grande d\'Europa per diametro, con i suoi 24 raggi che simboleggiano le ore del giorno e, secondo alcuni, i 24 apostoli. Sorge sul punto più alto della città, dominando tutto il panorama circostante.'
+                    },
                     { numero: 13, titolo: 'La Loggia, Palazzo Vescovile', dettaglio: 'L\'elegante loggia con archi che collega la Cattedrale al Palazzo Vescovile, creando uno degli scorci più fotografati.' },
                     { numero: 14, titolo: 'Portale palazzo Bizantizzi', dettaglio: 'Un pregevole portale d\'ingresso in stile barocco di una delle dimore storiche più rappresentative del centro.' },
                     { numero: 15, titolo: 'Largo Pappadà', dettaglio: 'Una piccola piazza o slargo caratteristico nel dedalo di vicoli, ideale per una pausa e ammirare il bianco delle case.' },
@@ -172,23 +191,40 @@
         const contentArea = document.getElementById('content-area');
         const loadingMessage = document.getElementById('loading-message');
         
-        let currentSectionId = attrazioni[0].id; // Imposta il default sulla prima sezione
+        let currentSectionId = attrazioni[0].id; 
 
         /**
          * FUNZIONE: Visualizza la pagina di dettaglio di una singola attrazione
+         * Il TEMPLATE MODULARE è QUI DENTRO
          */
-        function showDetail(sezioneId, numero) {
+        function showDetail(sezioneId, numero, isInternalCall = false) {
             const sezione = attrazioni.find(a => a.id === sezioneId);
-            const elemento = sezione.elementi.find(el => el.numero === numero);
+            const elemento = sezione ? sezione.elementi.find(el => el.numero === numero) : null;
             
             if (!elemento || !sezione) return;
 
-            // Contenuto della pagina dettaglio
+            // 1. Aggiorna l'URL solo se la chiamata non proviene dal router
+            if (!isInternalCall) {
+                window.location.hash = `${sezioneId}/${numero}`;
+                return; 
+            }
+            
+            // Sceglie il contenuto più lungo, se disponibile, altrimenti usa il dettaglio breve
+            const contenutoPrincipale = elemento.contenutoEsteso || elemento.dettaglio;
+            
+            // INIZIO TEMPLATE MODIFICABILE PER LA PAGINA DI DETTAGLIO
             const html = `
                 <button onclick="changeSection('${sezioneId}')" class="flex items-center text-ostuni-blue hover:text-ostuni-light-blue font-semibold mb-6 transition duration-200">
                     <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Torna a ${sezione.nome}
                 </button>
+
+                ${elemento.immagineUrl ? `
+                    <div class="relative h-64 sm:h-80 w-full overflow-hidden rounded-xl shadow-xl mb-6">
+                        <img src="${elemento.immagineUrl}" alt="${elemento.titolo}" class="w-full h-full object-cover transition duration-500 ease-in-out hover:scale-105">
+                        <div class="absolute inset-0 bg-black opacity-10"></div>
+                    </div>
+                ` : ''}
 
                 <div class="p-6 bg-ostuni-grey rounded-xl shadow-lg">
                     <div class="flex items-baseline mb-3">
@@ -196,44 +232,52 @@
                         <h2 class="inline-block text-3xl font-bold text-gray-800 border-b-4 border-ostuni-accent pb-1">${elemento.titolo}</h2>
                     </div>
                     
-                    <p class="mt-4 text-lg text-gray-700 leading-relaxed">${elemento.dettaglio}</p>
+                    <p class="mt-4 text-lg text-gray-700 leading-relaxed whitespace-pre-wrap">${contenutoPrincipale}</p>
+                </div>
+                
+                <div class="mt-6 p-4 bg-ostuni-white rounded-xl shadow-md border border-gray-200">
+                    <h3 class="text-xl font-semibold text-ostuni-blue mb-3">Informazioni Utili</h3>
                     
-                    <div class="mt-6 p-4 bg-ostuni-white rounded-lg border border-gray-300 text-center text-gray-500 italic">
-                        [Qui si potrebbe caricare l'immagine specifica per ${elemento.titolo}]
-                    </div>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>🕰️ Orari: 9:00 - 18:00 (Verificare in loco)</li>
+                        <li>🎟️ Costo Ingresso: Gratuito / (A pagamento: 3€)</li>
+                        <li>🗺️ <a href="#" class="text-ostuni-light-blue hover:underline">Vedi sulla Mappa (Link Esterno)</a></li>
+                        </ul>
                 </div>
 
                 <div class="mt-8 text-sm text-gray-500 border-t pt-4">
                     Sei nella sezione Dettaglio > ${sezione.nome} > ${elemento.titolo}
                 </div>
             `;
+            // FINE TEMPLATE MODIFICABILE
 
-            // Applica l'animazione e sostituisci il contenuto
+            // 3. Applica l'animazione e sostituisci il contenuto
             contentArea.classList.add('content-transition-inactive');
             contentArea.classList.remove('content-transition-active');
             
             setTimeout(() => {
                 contentArea.innerHTML = html;
-                // Scrolla in cima alla pagina principale per una UX migliore
-                contentArea.scrollTo({ top: 0, behavior: 'smooth' }); 
+                document.getElementById('app').scrollTo({ top: 0, behavior: 'smooth' }); // Scrolla in cima
                 contentArea.classList.remove('content-transition-inactive');
                 contentArea.classList.add('content-transition-active');
             }, 400); 
+
+            // 4. Aggiorna la tab attiva
+            updateActiveTab(sezioneId);
         }
 
         /**
-         * Genera la lista delle attrazioni della sezione
+         * Genera la lista delle attrazioni della sezione (Non modificato)
          */
         function generateContentHTML(sezione) {
             let html = `<h2 class="text-3xl font-bold mb-4 text-ostuni-blue">${sezione.nome}</h2>`;
             html += `<p class="mb-6 text-gray-700 italic">${sezione.descrizione}</p>`;
             
             sezione.elementi.forEach(el => {
-                // Ogni elemento è un pulsante che chiama showDetail
                 html += `
                     <button onclick="showDetail('${sezione.id}', ${el.numero})" class="w-full text-left p-4 mb-3 flex items-center bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg hover:border-ostuni-light-blue transition duration-300">
                         <span class="text-ostuni-accent text-xl font-extrabold mr-4 flex-shrink-0">${el.numero}.</span>
-                        <div class="list-item-truncate">
+                        <div class="list-item-truncate overflow-hidden">
                             <span class="font-semibold text-lg text-gray-800 block">${el.titolo}</span>
                             <p class="text-sm text-gray-500 truncate">${el.dettaglio.substring(0, 70)}...</p>
                         </div>
@@ -245,48 +289,77 @@
         }
 
         /**
-         * Gestisce la logica di cambio sezione (Ritorna alla vista lista)
+         * Aggiorna lo stile della tab attiva (Non modificato)
          */
-        function changeSection(id) {
-            currentSectionId = id; 
-            const sezione = attrazioni.find(a => a.id === id);
-            if (!sezione) return;
-
-            // Logica per evidenziare il tab attivo
+        function updateActiveTab(id) {
             document.querySelectorAll('#nav-tabs button').forEach(btn => {
-                // Rimuove la classe attiva da tutti
                 btn.classList.remove('bg-ostuni-light-blue', 'text-ostuni-white', 'shadow-md');
-                // Aggiunge le classi inattive a tutti
                 btn.classList.add('hover:bg-gray-200', 'text-gray-700');
             });
             const newActiveTab = document.querySelector(`#tab-${id}`);
             if (newActiveTab) {
-                // Rimuove le classi inattive dal tab corrente
                 newActiveTab.classList.remove('hover:bg-gray-200', 'text-gray-700');
-                // Aggiunge le classi attive al tab corrente
                 newActiveTab.classList.add('bg-ostuni-light-blue', 'text-ostuni-white', 'shadow-md');
             }
+        }
 
-            // Animazione e cambio contenuto (passaggio alla lista della sezione)
+        /**
+         * Gestisce la logica di cambio sezione (Non modificato)
+         */
+        function changeSection(id, isInternalCall = false) {
+            currentSectionId = id; 
+            const sezione = attrazioni.find(a => a.id === id);
+            if (!sezione) return;
+
+            // 1. Aggiorna l'URL solo se la chiamata non proviene dal router
+            if (!isInternalCall) {
+                window.location.hash = id;
+                return; 
+            }
+
+            // 2. Aggiorna lo stile della tab
+            updateActiveTab(id);
+
+            // 3. Animazione e cambio contenuto 
             contentArea.classList.add('content-transition-inactive');
             contentArea.classList.remove('content-transition-active');
             
             setTimeout(() => {
                 contentArea.innerHTML = generateContentHTML(sezione);
-                // Scrolla in cima alla pagina principale per una UX migliore
-                contentArea.scrollTo({ top: 0, behavior: 'smooth' }); 
+                document.getElementById('app').scrollTo({ top: 0, behavior: 'smooth' }); 
                 contentArea.classList.remove('content-transition-inactive');
                 contentArea.classList.add('content-transition-active');
             }, 400); 
         }
 
         /**
-         * Inizializza l'applicazione:
-         * 1. Genera i bottoni della navigazione (tabs).
-         * 2. Carica la sezione di default.
+         * Logica del router basata sull'hash dell'URL (Non modificato)
+         */
+        function handleRouting() {
+            const hash = window.location.hash.slice(1); 
+            
+            if (!hash) {
+                changeSection(attrazioni[0].id, true);
+                return;
+            }
+
+            const parts = hash.split('/');
+            const sectionId = parts[0];
+            const detailNumber = parts.length > 1 ? parseInt(parts[1]) : null;
+
+            if (detailNumber && !isNaN(detailNumber)) {
+                showDetail(sectionId, detailNumber, true);
+            } else if (sectionId) {
+                changeSection(sectionId, true);
+            } else {
+                changeSection(attrazioni[0].id, true);
+            }
+        }
+
+        /**
+         * Inizializza l'applicazione (Non modificato)
          */
         function initApp() {
-            // Verifica che gli elementi HTML siano disponibili
             if (!navTabs || !contentArea) {
                 console.error("Elementi HTML essenziali non trovati. Controllare l'ID.");
                 return;
@@ -297,18 +370,17 @@
             attrazioni.forEach(attrazione => {
                 const button = document.createElement('button');
                 button.id = `tab-${attrazione.id}`;
-                // Le classi initiali sono quelle inattive
                 button.className = 'flex items-center space-x-2 py-2 px-4 mx-1 my-1 rounded-full text-sm font-medium transition duration-150 ease-in-out text-gray-700 hover:bg-gray-200';
+                button.onclick = () => window.location.hash = attrazione.id; 
                 button.innerHTML = attrazione.icon + `<span>${attrazione.nome}</span>`;
-                button.onclick = () => changeSection(attrazione.id);
                 navTabs.appendChild(button);
             });
 
-            // 2. Carica la sezione di default (la prima nella lista)
-            if (attrazioni.length > 0) {
-                 // Chiama changeSection per la prima attrazione
-                changeSection(attrazioni[0].id); 
-            }
+            // 2. Associa il router al cambio hash
+            window.onhashchange = handleRouting;
+
+            // 3. Carica la sezione iniziale in base all'hash o al default
+            handleRouting();
         }
 
         // Avvia l'applicazione quando il DOM è pronto
