@@ -1,0 +1,59 @@
+const attrazioni = [
+    {
+        id: 'centro',
+        nome: 'Centro Storico',
+        icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
+        descrizione: 'Il labirinto bianco. Esplora i 28 punti storici del centro. Ogni elemento ha una pagina HTML dedicata.',
+        elementi: [
+            // NOTA: il 'slug' è il nome del file da creare!
+            { numero: 1, titolo: 'Obelisco di S. Oronzo', slug: 'obelisco', dettaglio: 'Monumento votivo in stile barocco, alto quasi 21 metri...' },
+            { numero: 2, titolo: 'Chiesa dello Spirito Santo', slug: 'chiesa-spirito-santo', dettaglio: 'Una delle chiese più antiche, caratterizzata da un bellissimo portale rinascimentale...' },
+            { numero: 3, titolo: 'Palazzo Municipale', slug: 'palazzo-municipale', dettaglio: 'Antico convento francescano, oggi sede del Municipio...' },
+            { numero: 4, titolo: 'Chiesa San F. d\'Assisi', slug: 'chiesa-san-francesco', dettaglio: 'Esempio di architettura barocca, costruita sul sito di una preesistente chiesa medievale...' },
+            { numero: 5, titolo: 'Stemma degli Zevallos', slug: 'stemma-zevallos', dettaglio: 'Uno stemma nobiliare che decora uno dei palazzi storici più importanti...' },
+            { numero: 6, titolo: 'Palazzo Ayroldi', slug: 'palazzo-ayroldi', dettaglio: 'Un imponente palazzo storico che si distingue per la sua elegante facciata...' },
+            { numero: 7, titolo: 'Palazzo Siccodà', slug: 'palazzo-siccoda', dettaglio: 'Esempio di residenza nobiliare nel cuore del centro storico...' },
+            { numero: 8, titolo: 'Capitello Corinzio', slug: 'capitello-corinzio', dettaglio: 'Antico elemento architettonico, probabilmente un resto di un tempio...' },
+            { numero: 9, titolo: 'Convento delle Monacelle', slug: 'convento-monacelle', dettaglio: 'Storico convento che oggi è un importante edificio pubblico...' },
+            { numero: 10, titolo: 'Chiesa Monacelle/Museo', slug: 'chiesa-monacelle-museo', dettaglio: 'Chiesa annessa al convento (n. 9), spesso adibita a ospitare eventi...' },
+            { numero: 11, titolo: 'Volta di Federico II', slug: 'volta-federico-ii', dettaglio: 'Un arco o passaggio storico che si dice sia legato alla presenza...' },
+            { numero: 12, titolo: 'Cattedrale', slug: 'cattedrale', dettaglio: 'Il simbolo di Ostuni. Famosa per il suo maestoso rosone gotico a 24 raggi...' },
+            { numero: 13, titolo: 'La Loggia, Palazzo Vescovile', slug: 'loggia-vescovile', dettaglio: 'L\'elegante loggia con archi che collega la Cattedrale al Palazzo Vescovile...' },
+            { numero: 14, titolo: 'Portale palazzo Bizantizzi', slug: 'palazzo-bizantizzi', dettaglio: 'Un pregevole portale d\'ingresso in stile barocco di una delle dimore...' },
+            { numero: 15, titolo: 'Largo Pappadà', slug: 'largo-pappada', dettaglio: 'Una piccola piazza o slargo caratteristico nel dedalo di vicoli...' },
+            { numero: 16, titolo: 'Portale palazzo Ghionda', slug: 'palazzo-ghionda', dettaglio: 'Magnifico portale di palazzo Ghionda, testimone dell\'architettura nobiliare...' },
+            { numero: 17, titolo: 'Portale palazzo Falgheri', slug: 'palazzo-falgheri', dettaglio: 'Un altro esempio di raffinato portale storico...' },
+            { numero: 18, titolo: 'Portale palazzo della Musica', slug: 'palazzo-musica', dettaglio: 'L\'ingresso del palazzo che ospita la Scuola o l\'Associazione della Musica locale...' },
+            { numero: 19, titolo: 'Portale palazzo Palmieri', slug: 'palazzo-palmieri', dettaglio: 'Uno dei palazzi più noti e imponenti, con un portale d\'ingresso maestoso...' },
+            { numero: 20, titolo: 'Chiesa San G. in Compostela', slug: 'chiesa-compostela', dettaglio: 'Piccola chiesa dedicata a San Giacomo di Compostela...' },
+            { numero: 21, titolo: 'Porta San Demetrio', slug: 'porta-san-demetrio', dettaglio: 'Una delle antiche porte di accesso al centro storico fortificato...' },
+            { numero: 22, titolo: 'Portale palazzo Jurleo', slug: 'palazzo-jurleo', dettaglio: 'Un pregevole portale che merita una visita per i suoi dettagli scultorei...' },
+            { numero: 23, titolo: 'Portale palazzo Calamo', slug: 'palazzo-calamo', dettaglio: 'Suggestivo portale di un altro palazzo storico...' },
+            { numero: 24, titolo: 'Portale palazzo Mileti', slug: 'palazzo-mileti', dettaglio: 'Esempio di architettura civile barocca ostunese, con balconi decorati...' },
+            { numero: 25, titolo: 'Chiesa Santa M. della Stella', slug: 'chiesa-stella', dettaglio: 'Chiesa dedicata alla Madonna della Stella, con un interno semplice...' },
+            { numero: 26, titolo: 'Porta Nova', slug: 'porta-nova', dettaglio: 'Una delle porte più recenti o ristrutturate. Da qui si accede al borgo antico...' },
+            { numero: 27, titolo: 'Chiesa San Pietro', slug: 'chiesa-san-pietro', dettaglio: 'Antica chiesa che contribuisce al panorama architettonico del centro...' },
+            { numero: 28, titolo: 'Chiesa Madonna del Carmine', slug: 'chiesa-carmine', dettaglio: 'Una chiesa importante, spesso punto di riferimento nel quartiere...' }
+        ]
+    },
+    {
+        id: 'mare',
+        nome: 'Costa e Spiagge',
+        icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
+        descrizione: 'La costa Bandiera Blu di Ostuni. Un litorale vario che offre sia spiagge sabbiose che calette rocciose. Clicca per i dettagli!',
+        elementi: [
+            { numero: 1, titolo: 'Rosa Marina', slug: 'rosa-marina', dettaglio: 'Rinomata località turistica con ampie spiagge libere e attrezzate...' },
+            { numero: 2, titolo: 'Torre Guaceto (Riserva Naturale)', slug: 'torre-guaceto', dettaglio: 'Area marina protetta, un paradiso incontaminato. Ideale per snorkeling...' }
+        ]
+    },
+    {
+        id: 'dintorni',
+        nome: 'Dintorni e Natura',
+        icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>',
+        descrizione: 'Esplora la Piana degli Ulivi Millenari e i siti archeologici appena fuori città.',
+        elementi: [
+            { numero: 1, titolo: 'Parco delle Dune Costiere', slug: 'dune-costiere', dettaglio: 'Un\'area protetta con percorsi naturalistici ideali per escursioni...' },
+            { numero: 2, titolo: 'Masseria Brancati', slug: 'masseria-brancati', dettaglio: 'Una masseria storica dove è possibile ammirare un ulivo millenario...' }
+        ]
+    }
+];
