@@ -28,8 +28,8 @@
             font-family: 'Inter', sans-serif;
         }
         .icon {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
         }
         .content-transition-active {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -53,12 +53,9 @@
             <div id="loading-message" class="text-center p-10 text-gray-500">Caricamento delle attrazioni...</div>
             <div id="section-content" class="content-transition-inactive"></div>
         </main>
-        <footer class="bg-gray-100 p-4 text-center text-xs text-gray-500 rounded-b-xl">
-            Scegli una sezione e scopri i dettagli!
-        </footer>
+        <footer class="bg-gray-100 p-4 text-center text-xs text-gray-500 rounded-b-xl">Scegli una sezione e scopri i dettagli!</footer>
     </div>
     <script>
-        // --- Dati delle Attrazioni ---
         const attrazioni = [
             {
                 id: 'centro',
@@ -94,7 +91,6 @@
             }
         ];
 
-        // --- Funzioni per l'Interazione ---
         const navTabs = document.getElementById('nav-tabs');
         const contentArea = document.getElementById('section-content');
         const loadingMessage = document.getElementById('loading-message');
