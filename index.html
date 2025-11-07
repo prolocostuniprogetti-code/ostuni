@@ -13,24 +13,49 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        'ostuni-blue': '#1e40af',
-                        'ostuni-light-blue': '#3b82f6',
-                        'ostuni-white': '#fefefe',
-                        'ostuni-grey': '#e5e7eb',
+                        'ostuni-blue': '#1e40af', // Blu più scuro e istituzionale
+                        'ostuni-light-blue': '#3b82f6', // Blu brillante per l'accento
+                        'ostuni-white': '#fefefe', // Bianco candido
+                        'ostuni-grey': '#f3f4f6', // Grigio chiaro per sfondo/bordi
                     }
                 }
             }
         }
     </script>
     <style>
+        /* Stile di base e font */
         body {
             background-color: #f3f4f6;
             font-family: 'Inter', sans-serif;
         }
         .icon {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
         }
+        /* CLASSI AGGIUNTE PER IL NUOVO DESIGN E L'ACCORDION */
+        
+        /* 1. Header con Immagine di Copertina */
+        .header-bg {
+            background-image: url('https://images.unsplash.com/photo-1594917409252-f1981e7d0e4f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Immagine Iconica di Ostuni */
+            background-size: cover;
+            background-position: center;
+            height: 200px; /* Altezza per mostrare bene l'immagine */
+            position: relative;
+        }
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(30, 64, 175, 0.6); /* Overlay blu scuro semi-trasparente */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        /* 2. Transizioni e Animazioni */
         .content-transition-active {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             opacity: 1;
@@ -40,86 +65,138 @@
             opacity: 0;
             transform: translateY(10px);
         }
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
+
     <div id="app" class="max-w-4xl mx-auto bg-ostuni-white shadow-2xl rounded-xl overflow-hidden">
-        <header class="bg-ostuni-blue text-ostuni-white p-6 rounded-t-xl">
-            <h1 class="text-3xl font-extrabold text-center tracking-tight">OSTUNI: La Città Bianca</h1>
-            <p class="text-center mt-1 text-sm opacity-90">Esplora le meraviglie di Ostuni e dei suoi dintorni in modo interattivo.</p>
+        
+        <header class="header-bg rounded-t-xl">
+            <div class="header-overlay text-ostuni-white rounded-t-xl">
+                <h1 class="text-4xl font-extrabold text-center tracking-tight drop-shadow-lg">OSTUNI: La Città Bianca</h1>
+                <p class="text-center mt-2 text-md font-light">Esplora le meraviglie di Ostuni e dei suoi dintorni in modo interattivo.</p>
+            </div>
         </header>
-        <nav id="nav-tabs" class="flex flex-wrap justify-center border-b border-ostuni-grey bg-white p-2"></nav>
+
+        <nav id="nav-tabs" class="flex flex-wrap justify-center border-b border-ostuni-grey bg-white p-2">
+            </nav>
+
         <main id="content-area" class="p-4 sm:p-6 bg-ostuni-white min-h-[400px]">
             <div id="loading-message" class="text-center p-10 text-gray-500">Caricamento delle attrazioni...</div>
             <div id="section-content" class="content-transition-inactive"></div>
         </main>
-        <footer class="bg-gray-100 p-4 text-center text-xs text-gray-500 rounded-b-xl">Scegli una sezione e scopri i dettagli!</footer>
+        
+        <footer class="bg-gray-100 p-4 text-center text-xs text-gray-500 rounded-b-xl">
+            Scegli una sezione e clicca sui titoli per scoprire i dettagli!
+        </footer>
     </div>
+
     <script>
+        // --- Dati delle Attrazioni ---
         const attrazioni = [
             {
                 id: 'centro',
                 nome: 'Centro Storico',
                 icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
-                descrizione: 'Il cuore pulsante di Ostuni, un labirinto di vicoli bianchi e storici che conducono ai principali monumenti.',
+                descrizione: 'Il cuore pulsante di Ostuni, un labirinto di vicoli bianchi e storici che conducono ai principali monumenti. Clicca su ogni titolo per saperne di più!',
                 elementi: [
-                    { titolo: 'Cattedrale di Santa Maria Assunta', dettaglio: 'Famosa per il suo maestoso rosone gotico a 24 raggi sulla sommità del colle.' },
-                    { titolo: 'Arco Scoppa', dettaglio: 'Un elegante ponte in pietra che unisce il Palazzo Vescovile e il Seminario.' },
-                    { titolo: 'Casa con la Porta Blu', dettaglio: 'L\'angolo più instagrammato della città, con la sua porta colorata che spicca sul bianco.' },
-                    { titolo: 'Mura Aragonesi', dettaglio: 'Antiche fortificazioni che circondano il centro, offrendo panorami mozzafiato sulla piana degli ulivi.' }
+                    { titolo: 'Cattedrale di Santa Maria Assunta', dettaglio: 'Famosa per il suo maestoso rosone gotico a 24 raggi sulla sommità del colle, offre una vista panoramica unica. L\'interno è in stile barocco.' },
+                    { titolo: 'Arco Scoppa', dettaglio: 'Un elegante ponte in pietra che unisce il Palazzo Vescovile e il Seminario, creando uno scorcio fotografico iconico e imperdibile.' },
+                    { titolo: 'Casa con la Porta Blu', dettaglio: 'L\'angolo più instagrammato della città: la sua porta di un blu intenso spicca in netto contrasto con il bianco candido dei muri, un simbolo di Ostuni.' },
+                    { titolo: 'Mura Aragonesi', dettaglio: 'Antiche fortificazioni che circondano il centro, perfette per una passeggiata al tramonto e per godere di panorami mozzafiato sulla piana degli ulivi millenari.' }
                 ]
             },
             {
                 id: 'mare',
                 nome: 'Costa e Spiagge',
                 icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
-                descrizione: 'La costa di Ostuni è Bandiera Blu. Un litorale vario che offre sia spiagge sabbiose che calette rocciose.',
+                descrizione: 'La costa di Ostuni è Bandiera Blu, un litorale vario che offre sia spiagge sabbiose che calette rocciose. Clicca sui nomi per i dettagli!',
                 elementi: [
-                    { titolo: 'Rosa Marina', dettaglio: 'Una rinomata località turistica con ampie spiagge libere e attrezzate.' },
-                    { titolo: 'Torre Guaceto (Riserva)', dettaglio: 'Area marina protetta, ideale per snorkeling e immersioni. Meraviglioso ecosistema.' }
+                    { titolo: 'Rosa Marina', dettaglio: 'Una rinomata località turistica con ampie spiagge libere e attrezzate, ideale per le famiglie e per chi cerca servizi.' },
+                    { titolo: 'Torre Guaceto (Riserva Naturale)', dettaglio: 'Area marina protetta, un paradiso incontaminato. Ideale per snorkeling, birdwatching e lunghe passeggiate nella natura selvaggia. Accesso controllato.' }
                 ]
             },
             {
                 id: 'dintorni',
                 nome: 'Dintorni e Natura',
                 icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>',
-                descrizione: 'Esplora la Piana degli Ulivi Millenari e i siti archeologici appena fuori città.',
+                descrizione: 'Scopri la Piana degli Ulivi Millenari e i siti archeologici appena fuori città. Tutta l\'interazione è a portata di click!',
                 elementi: [
-                    { titolo: 'Parco delle Dune Costiere', dettaglio: 'Percorsi naturalistici tra ulivi secolari e macchia mediterranea.' },
-                    { titolo: 'Masseria Brancati', dettaglio: 'Una masseria storica che ospita uno degli ulivi più antichi della regione.' }
+                    { titolo: 'Parco delle Dune Costiere', dettaglio: 'Un'area protetta con percorsi naturalistici ideali per escursioni a piedi o in bicicletta, tra ulivi secolari, flora e fauna mediterranea.' },
+                    { titolo: 'Masseria Brancati', dettaglio: 'Una masseria storica dove è possibile ammirare un ulivo millenario (stimato oltre 3000 anni!) e degustare l\'olio d\'oliva locale.' }
                 ]
             }
         ];
 
+        // --- Variabili e Funzioni per l'Interazione ---
         const navTabs = document.getElementById('nav-tabs');
         const contentArea = document.getElementById('section-content');
         const loadingMessage = document.getElementById('loading-message');
         let currentActiveTab = null;
+        
+        /**
+         * FUNZIONE AGGIUNTA: Gestisce l'apertura e la chiusura dei dettagli (Accordion)
+         */
+        function toggleDetail(id) {
+            const detailElement = document.getElementById(id);
+            // L'icona è identificata da un ID basato su quello del dettaglio, prefissato da 'icon-'
+            const iconElement = document.getElementById(`icon-${id}`);
 
+            if (detailElement.classList.contains('hidden')) {
+                // APRI: Rimuovi 'hidden' per mostrare il contenuto e ruota l'icona
+                detailElement.classList.remove('hidden');
+                iconElement.classList.add('rotate-180');
+            } else {
+                // CHIUDI: Aggiungi 'hidden' per nascondere il contenuto e ripristina l'icona
+                detailElement.classList.add('hidden');
+                iconElement.classList.remove('rotate-180');
+            }
+        }
+
+
+        /**
+         * Genera il contenuto HTML per la sezione selezionata (Modificata per l'Accordion)
+         * @param {object} sezione - L'oggetto attrazione da visualizzare
+         */
         function generateContentHTML(sezione) {
             let html = `<h2 class="text-2xl font-bold mb-4 text-ostuni-blue">${sezione.nome}</h2>`;
             html += `<p class="mb-6 text-gray-700 italic">${sezione.descrizione}</p>`;
-
-            sezione.elementi.forEach(el => {
+            
+            sezione.elementi.forEach((el, index) => {
+                const detailId = `${sezione.id}-detail-${index}`; // ID univoco per il dettaglio
                 html += `
-                    <div class="mb-4 p-4 border-l-4 border-ostuni-light-blue bg-ostuni-grey rounded-r-lg shadow-sm">
-                        <h3 class="font-semibold text-lg text-gray-800">${el.titolo}</h3>
-                        <p class="text-sm text-gray-600">${el.dettaglio}</p>
+                    <div class="mb-3 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                        <button onclick="toggleDetail('${detailId}')" class="w-full text-left p-4 flex justify-between items-center bg-ostuni-grey hover:bg-gray-200 transition duration-200">
+                            <span class="font-semibold text-lg text-gray-800">${el.titolo}</span>
+                            <svg id="icon-${detailId}" class="icon transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="${detailId}" class="p-4 bg-ostuni-white text-base text-gray-600 border-t border-gray-200 hidden">
+                            ${el.dettaglio}
+                        </div>
                     </div>
                 `;
             });
             return html;
         }
 
+        /**
+         * Gestisce la logica di cambio sezione
+         * @param {string} id - L'ID dell'attrazione da visualizzare
+         */
         function changeSection(id) {
             const sezione = attrazioni.find(a => a.id === id);
             if (!sezione) return;
 
+            // Rimuovi la classe attiva dal vecchio tab
             if (currentActiveTab) {
                 currentActiveTab.classList.remove('bg-ostuni-light-blue', 'text-ostuni-white');
                 currentActiveTab.classList.add('hover:bg-ostuni-grey');
             }
 
+            // Aggiungi la classe attiva al nuovo tab
             const newActiveTab = document.querySelector(`#tab-${id}`);
             if (newActiveTab) {
                 newActiveTab.classList.remove('hover:bg-ostuni-grey');
@@ -127,6 +204,7 @@
                 currentActiveTab = newActiveTab;
             }
 
+            // Animazione e cambio contenuto
             contentArea.classList.add('content-transition-inactive');
             contentArea.classList.remove('content-transition-active');
             
@@ -134,26 +212,32 @@
                 contentArea.innerHTML = generateContentHTML(sezione);
                 contentArea.classList.remove('content-transition-inactive');
                 contentArea.classList.add('content-transition-active');
-            }, 300);
+            }, 300); // Ritardo per l'animazione
         }
 
+        /**
+         * Inizializza l'applicazione: genera i tab e carica il primo contenuto
+         */
         function initApp() {
             loadingMessage.style.display = 'none';
 
+            // 1. Genera i bottoni delle tab
             attrazioni.forEach(attrazione => {
                 const button = document.createElement('button');
                 button.id = `tab-${attrazione.id}`;
-                button.className = 'flex items-center space-x-2 py-2 px-4 mx-1 my-1 rounded-full text-sm font-medium text-gray-700 transition duration-150 ease-in-out hover:bg-ostuni-grey';
+                button.className = 'flex items-center space-x-2 py-2 px-4 mx-1 my-1 rounded-full text-sm font-medium text-gray-700 transition duration-150 ease-in-out hover:bg-gray-200';
                 button.innerHTML = attrazione.icon + `<span>${attrazione.nome}</span>`;
                 button.onclick = () => changeSection(attrazione.id);
                 navTabs.appendChild(button);
             });
 
+            // 2. Carica la sezione di default (il primo elemento)
             if (attrazioni.length > 0) {
                 changeSection(attrazioni[0].id);
             }
         }
 
+        // Avvia l'app al caricamento della pagina
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
