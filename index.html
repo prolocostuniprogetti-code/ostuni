@@ -13,17 +13,16 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        'ostuni-blue': '#1e40af', // Blu più scuro e istituzionale
-                        'ostuni-light-blue': '#3b82f6', // Blu brillante per l'accento
-                        'ostuni-white': '#fefefe', // Bianco candido
-                        'ostuni-grey': '#e5e7eb', // Grigio chiaro per sfondo/bordi
+                        'ostuni-blue': '#1e40af',
+                        'ostuni-light-blue': '#3b82f6',
+                        'ostuni-white': '#fefefe',
+                        'ostuni-grey': '#e5e7eb',
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Stile di base e font */
         body {
             background-color: #f3f4f6;
             font-family: 'Inter', sans-serif;
@@ -32,7 +31,6 @@
             width: 20px;
             height: 20px;
         }
-        /* Classe per animazione fluida dei contenuti */
         .content-transition-active {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             opacity: 1;
@@ -45,27 +43,20 @@
     </style>
 </head>
 <body class="p-4 sm:p-8">
-
     <div id="app" class="max-w-4xl mx-auto bg-ostuni-white shadow-2xl rounded-xl overflow-hidden">
-        
         <header class="bg-ostuni-blue text-ostuni-white p-6 rounded-t-xl">
             <h1 class="text-3xl font-extrabold text-center tracking-tight">OSTUNI: La Città Bianca</h1>
             <p class="text-center mt-1 text-sm opacity-90">Esplora le meraviglie di Ostuni e dei suoi dintorni in modo interattivo.</p>
         </header>
-
-        <nav id="nav-tabs" class="flex flex-wrap justify-center border-b border-ostuni-grey bg-white p-2">
-            </nav>
-
+        <nav id="nav-tabs" class="flex flex-wrap justify-center border-b border-ostuni-grey bg-white p-2"></nav>
         <main id="content-area" class="p-4 sm:p-6 bg-ostuni-white min-h-[400px]">
             <div id="loading-message" class="text-center p-10 text-gray-500">Caricamento delle attrazioni...</div>
             <div id="section-content" class="content-transition-inactive"></div>
         </main>
-        
         <footer class="bg-gray-100 p-4 text-center text-xs text-gray-500 rounded-b-xl">
             Scegli una sezione e scopri i dettagli!
         </footer>
     </div>
-
     <script>
         // --- Dati delle Attrazioni ---
         const attrazioni = [
@@ -109,14 +100,10 @@
         const loadingMessage = document.getElementById('loading-message');
         let currentActiveTab = null;
 
-        /**
-         * Genera il contenuto HTML per la sezione selezionata
-         * @param {object} sezione - L'oggetto attrazione da visualizzare
-         */
         function generateContentHTML(sezione) {
-            let html = <h2 class="text-2xl font-bold mb-4 text-ostuni-blue">${sezione.nome}</h2>;
-            html += <p class="mb-6 text-gray-700 italic">${sezione.descrizione}</p>;
-            
+            let html = `<h2 class="text-2xl font-bold mb-4 text-ostuni-blue">${sezione.nome}</h2>`;
+            html += `<p class="mb-6 text-gray-700 italic">${sezione.descrizione}</p>`;
+
             sezione.elementi.forEach(el => {
                 html += `
                     <div class="mb-4 p-4 border-l-4 border-ostuni-light-blue bg-ostuni-grey rounded-r-lg shadow-sm">
@@ -128,29 +115,22 @@
             return html;
         }
 
-        /**
-         * Gestisce la logica di cambio sezione
-         * @param {string} id - L'ID dell'attrazione da visualizzare
-         */
         function changeSection(id) {
             const sezione = attrazioni.find(a => a.id === id);
             if (!sezione) return;
 
-            // Rimuovi la classe attiva dal vecchio tab
             if (currentActiveTab) {
                 currentActiveTab.classList.remove('bg-ostuni-light-blue', 'text-ostuni-white');
                 currentActiveTab.classList.add('hover:bg-ostuni-grey');
             }
 
-            // Aggiungi la classe attiva al nuovo tab
-            const newActiveTab = document.querySelector(#tab-${id});
+            const newActiveTab = document.querySelector(`#tab-${id}`);
             if (newActiveTab) {
                 newActiveTab.classList.remove('hover:bg-ostuni-grey');
                 newActiveTab.classList.add('bg-ostuni-light-blue', 'text-ostuni-white');
                 currentActiveTab = newActiveTab;
             }
 
-            // Animazione e cambio contenuto
             contentArea.classList.add('content-transition-inactive');
             contentArea.classList.remove('content-transition-active');
             
@@ -158,32 +138,26 @@
                 contentArea.innerHTML = generateContentHTML(sezione);
                 contentArea.classList.remove('content-transition-inactive');
                 contentArea.classList.add('content-transition-active');
-            }, 300); // Ritardo per l'animazione
+            }, 300);
         }
 
-        /**
-         * Inizializza l'applicazione: genera i tab e carica il primo contenuto
-         */
         function initApp() {
             loadingMessage.style.display = 'none';
 
-            // 1. Genera i bottoni delle tab
             attrazioni.forEach(attrazione => {
                 const button = document.createElement('button');
-                button.id = tab-${attrazione.id};
+                button.id = `tab-${attrazione.id}`;
                 button.className = 'flex items-center space-x-2 py-2 px-4 mx-1 my-1 rounded-full text-sm font-medium text-gray-700 transition duration-150 ease-in-out hover:bg-ostuni-grey';
-                button.innerHTML = attrazione.icon + <span>${attrazione.nome}</span>;
+                button.innerHTML = attrazione.icon + `<span>${attrazione.nome}</span>`;
                 button.onclick = () => changeSection(attrazione.id);
                 navTabs.appendChild(button);
             });
 
-            // 2. Carica la sezione di default (il primo elemento)
             if (attrazioni.length > 0) {
                 changeSection(attrazioni[0].id);
             }
         }
 
-        // Avvia l'app al caricamento della pagina
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
