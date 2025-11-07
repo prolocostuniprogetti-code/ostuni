@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; }
-        /* Stile aggiuntivo per il lettore audio, per integrarlo bene con Tailwind */
+        /* Stile aggiunto per il lettore audio */
         .audio-container { 
             background-color: #f3f4f6; 
             padding: 1rem; 
@@ -33,10 +33,10 @@
         </div>
 
         <div class="audio-container flex items-center space-x-3">
-            <svg class="w-6 h-6 text-ostuni-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h4a2 2 0 012 2v2M7 7h10"></path></svg>
+            <svg class="w-6 h-6 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h4a2 2 0 012 2v2M7 7h10"></path></svg>
             <span class="font-medium text-gray-700 flex-shrink-0">Ascolta la Guida:</span>
             <audio controls class="flex-grow">
-                <source src="../immagini/obelisco_audio.mp3" type="audio/mpeg">
+                <source src="../immagini/obelisco.mp3" type="audio/mpeg"> 
                 Il tuo browser non supporta l'elemento audio.
             </audio>
         </div>
@@ -44,6 +44,24 @@
             <p>L'Obelisco di Sant'Oronzo, eretto tra il 1771 e il 1773 su progetto del maestro artigiano **Giuseppe Greco**, è un maestoso monumento votivo in stile Barocco Pugliese, alto circa 21 metri. Simbolo di gratitudine civica, fu costruito per ringraziare il patrono Sant'Oronzo per aver protetto la città dal disastroso **terremoto del 1743** e dalle epidemie che colpirono il Salento in quel periodo.</p>
             
             <h2 class="text-2xl font-bold mt-6 mb-3 text-blue-700">Dettagli Scultorei e Architettonici</h2>
+            <p>L'intera opera è realizzata in pietra locale, caratteristica che le conferisce la tipica luminosità. La struttura si divide in tre parti principali:</p>
+
+            <h3>Il Basamento e le Statue dei Santi Protettori</h3>
+            <p>La base, a pianta quadrangolare, è il punto più ricco di dettagli. Nelle quattro nicchie principali sono collocate le statue di altri quattro santi, anch'essi invocati come protettori della città:</p>
+            <ul>
+                <li>**Sant'Agostino** (Vescovo e Dottore della Chiesa)</li>
+                <li>**San Giorgio** (Soldato e Martire)</li>
+                <li>**San Biagio** (Protettore della gola)</li>
+                <li>**Sant'Irene** (Vergine e Martire)</li>
+            </ul>
+            <p>Il basamento è ulteriormente arricchito da volute, mascheroni e rilievi che esaltano la ricchezza dello stile barocco.</p>
+            
+            <h3>Il Fusto e la Decorazione</h3>
+            <p>Il fusto della colonna è decorato con fregi, cornici elaborate e festoni. In alto, quattro grandi volute in pietra si innalzano verso l'alto, creando un effetto scenografico di movimento che culmina nella parte sommitale.</p>
+            
+            <h3>La Statua di Sant'Oronzo</h3>
+            <p>L'opera è coronata dalla statua del santo patrono. Sant'Oronzo è raffigurato con gli abiti vescovili, mentre alza il braccio destro in un gesto di **benedizione e protezione** verso la popolazione di Ostuni.</p>
+            
             <h2 class="text-2xl font-bold mt-6 mb-3 text-blue-700">Informazioni Pratiche</h2>
             <ul>
                 <li>🕰️ **Epoca di costruzione:** 1771-1773.</li>
