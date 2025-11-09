@@ -48,9 +48,9 @@
             padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;
         }
 
-        /* NUOVO: Stile per il div della Mappa */
+        /* Stile per il div della Mappa (occupa l'intera area sotto l'header) */
         #map {
-            height: 100vh; /* La mappa occupa l'intera altezza del pannello */
+            height: calc(100vh - 72px); /* 100% viewport - altezza header mappa */
             width: 100%;
         }
     </style>
@@ -61,7 +61,7 @@
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <h1 class="text-xl font-bold">Viaggiatore Smart City</h1>
             <button onclick="showMap()" class="text-white text-sm opacity-90 p-1 rounded-lg hover:bg-blue-600 transition duration-150">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 8 0111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </button>
         </div>
     </header>
@@ -127,12 +127,13 @@
         const detailContent = document.getElementById('detail-content');
         const detailTitleHeader = document.getElementById('detail-title-header');
         const welcomeCard = document.getElementById('welcome-card');
-        const mapPanel = document.getElementById('map-panel'); // NUOVO: Riferimento al pannello mappa
+        const mapPanel = document.getElementById('map-panel'); 
         let userName = localStorage.getItem('userName'); 
-        let currentMap = null; // Variabile per tenere l'istanza della mappa
-
-        // *** Devi ancora aggiungere qui le tue configurazioni Firebase, se le stai usando. ***
+        let currentMap = null; 
         
+        // ATTENZIONE: Se hai intenzione di usare Firebase in futuro, 
+        // inserisci qui la configurazione e l'inizializzazione.
+
         function initApp() {
             renderWelcomeCard();
             
@@ -141,7 +142,7 @@
             changeSection(initialSection);
         }
 
-        // --- FUNZIONI DI MAPPA (NUOVE) ---
+        // --- FUNZIONI MAPPA ---
 
         function showMap() {
             mapPanel.classList.add('active');
@@ -151,7 +152,7 @@
             if (!currentMap) {
                 initMap();
             } else {
-                // Se la mappa esiste, devi invalidarne la dimensione per farla adattare al div
+                // Necessario per assicurare che la mappa venga ridimensionata correttamente
                 currentMap.invalidateSize();
             }
         }
@@ -162,36 +163,35 @@
         }
         
         function initMap() {
-            // Coordinate di Ostuni (Centro storico)
             const ostuniCoords = [40.7303, 17.5752];
 
             // 1. Inizializza la Mappa
-            currentMap = L.map('map').setView(ostuniCoords, 15); // 15 è il livello di zoom
+            currentMap = L.map('map').setView(ostuniCoords, 15);
 
-            // 2. Aggiungi i Tile Layer (l'aspetto visivo della mappa)
+            // 2. Aggiungi i Tile Layer (OpenStreetMap)
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(currentMap);
 
-            // 3. Aggiungi i Marker di tutti i POI (richiede che 'attrazioni' abbia le coordinate)
-            
-            // Per il momento, usiamo solo Obelisco, Cattedrale e Spirito Santo come esempio.
-            // DOVRAI AGGIUNGERE lat, lng all'array 'elementi' in data.js per tutti i POI.
-            const samplePois = [
-                { lat: 40.7301, lng: 17.5755, title: 'Obelisco di S. Oronzo' }, // Obelisco (Piazza Libertà)
-                { lat: 40.7297, lng: 17.5768, title: 'Cattedrale' }, // Cattedrale (cima del colle)
-                { lat: 40.7313, lng: 17.5760, title: 'Chiesa dello Spirito Santo' }, // Spirito Santo
-                // Aggiungi qui le coordinate di tutti gli altri POI
-            ];
-            
-            samplePois.forEach(poi => {
-                L.marker([poi.lat, poi.lng])
-                    .addTo(currentMap)
-                    .bindPopup(`<b>${poi.title}</b><br>Tocca per i dettagli.`);
+            // 3. Aggiungi i Marker di tutti i POI dall'array 'attrazioni'
+            attrazioni.forEach(section => {
+                section.elementi.forEach(item => {
+                    if (item.lat && item.lng) {
+                        L.marker([item.lat, item.lng])
+                            .addTo(currentMap)
+                            .bindPopup(`
+                                <b>${item.titolo}</b><br>${item.dettaglio}
+                                <br><button onclick="showDetail('${item.id}', { preventDefault: () => {} }); hideMap();" 
+                                    class="bg-blue-500 text-white text-xs px-2 py-1 rounded mt-2 hover:bg-blue-600 transition">
+                                    Vedi Dettaglio
+                                </button>
+                            `);
+                    }
+                });
             });
         }
         
-        // --- LOGICA DI PERSONALIZZAZIONE (Come prima) ---
+        // --- LOGICA DI PERSONALIZZAZIONE (Iscrizione) ---
         function renderWelcomeCard() {
             if (userName) {
                 welcomeCard.innerHTML = `
@@ -224,7 +224,7 @@
             }
         }
 
-        // --- FUNZIONI SPA (Come prima) ---
+        // --- FUNZIONI SPA (Dettaglio) ---
         function changeSection(sectionId) {
             const sectionData = attrazioni.find(s => s.id === sectionId);
             const listContainer = document.getElementById('attraction-list');
@@ -266,9 +266,10 @@
         }
 
         function showDetail(attractionId, event) {
-            event.preventDefault(); 
+            if (event) {
+                event.preventDefault(); 
+            }
             
-            // getAttractionDetail è definito in data.js
             const detailHTML = getAttractionDetail(attractionId);
             
             detailContent.innerHTML = detailHTML;
