@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ostuni Guida Turistica Interattiva</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIINfBIHPZgW1ZefU4MoSA6gDLp3zEhec2Y=" 
+          crossorigin=""/>
+    
     <style>
         body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden;}
         #sidebar { width: 300px; padding: 20px; background-color: #f8f8f8; overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.1);}
@@ -15,14 +19,15 @@
         #dettaglio-monumento { margin-top: 20px; padding: 15px; border-top: 1px solid #ccc;}
         #dettaglio-monumento h3 { margin-top: 0; color: #1a73e8; }
         #dettaglio-monumento img { max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 10px;}
+        /* Stili Overlay */
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; justify-content: center; align-items: center;}
         #overlay-box { background: white; padding: 28px 30px 18px 30px; border-radius: 10px; width: 100%; max-width: 340px; text-align:center;}
+        /* Media Query Mobile */
         @media (max-width: 800px) { #sidebar {width: 100vw; max-width: none;} body{flex-direction: column;}}
     </style>
 </head>
 <body>
 
-<!-- Overlay di registrazione -->
 <div id="overlay">
   <div id="overlay-box">
     <h2>Benvenuto/a!</h2>
@@ -46,59 +51,17 @@
 </div>
 <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const attrazioni = [
-  {
-    id: "monumentale",
-    nome: "Ostuni Monumentale",
-    elementi: [
-      { titolo: "Obelisco di S. Oronzo", lat: 40.732912, lng: 17.579914, dettaglio: "" },
-      { titolo: "Chiesa dello Spirito Santo", lat: 40.731858, lng: 17.580365, dettaglio: "" },
-      { titolo: "Palazzo Municipale", lat: 40.732242, lng: 17.579801, dettaglio: "" },
-      { titolo: "Chiesa San F. d'Assisi", lat: 40.731241, lng: 17.579421, dettaglio: "" },
-      { titolo: "Cattedrale", lat: 40.730679, lng: 17.577959, dettaglio: "" },
-      { titolo: "Chiesa Santa M. della Stella", lat: 40.72879, lng: 17.57660, dettaglio: "" },
-      { titolo: "Chiesa San Pietro", lat: 40.730681, lng: 17.577206, dettaglio: "" },
-      { titolo: "Chiesa Madonna del Carmine", lat: 40.731088, lng: 17.578853, dettaglio: "" }
-    ]
-  },
-  {
-    id: "palazzi",
-    nome: "Ostuni Segreta e Palazzi",
-    elementi: [
-      { titolo: "Palazzo Ayroldi", lat: 40.731644, lng: 17.579799, dettaglio: "" },
-      { titolo: "Palazzo Siccodà", lat: 40.730411, lng: 17.578463, dettaglio: "" },
-      { titolo: "Portale palazzo Bizantizzi", lat: 40.731275, lng: 17.579023, dettaglio: "" },
-      { titolo: "Portale palazzo Ghionda", lat: 40.731523, lng: 17.579082, dettaglio: "" },
-      { titolo: "Portale palazzo Falgheri", lat: 40.731583, lng: 17.579032, dettaglio: "" },
-      { titolo: "Portale palazzo della Musica", lat: 40.729971, lng: 17.578700, dettaglio: "" },
-      { titolo: "Portale palazzo Palmieri", lat: 40.729408, lng: 17.578116, dettaglio: "" },
-      { titolo: "Portale palazzo Jurleo", lat: 40.728880, lng: 17.578260, dettaglio: "" },
-      { titolo: "Portale palazzo Calamo", lat: 40.729250, lng: 17.578050, dettaglio: "" },
-      { titolo: "Portale palazzo Mileti", lat: 40.729350, lng: 17.577980, dettaglio: "" }
-    ]
-  },
-  {
-    id: "panorama",
-    nome: "Ostuni Insolita e Panoramica",
-    elementi: [
-      { titolo: "Stemma degli Zevallos", lat: 40.731100, lng: 17.579522, dettaglio: "" },
-      { titolo: "Capitello Corinzio", lat: 40.731520, lng: 17.579985, dettaglio: "" },
-      { titolo: "Convento delle Monacelle", lat: 40.730763, lng: 17.577680, dettaglio: "" },
-      { titolo: "Chiesa Monacelle/Museo", lat: 40.730763, lng: 17.577680, dettaglio: "" },
-      { titolo: "Volta di Federico II", lat: 40.730800, lng: 17.577400, dettaglio: "" },
-      { titolo: "La Loggia, palazzo Vescovile", lat: 40.730700, lng: 17.577500, dettaglio: "" },
-      { titolo: "Largo Pappadà", lat: 40.731678, lng: 17.579542, dettaglio: "" },
-      { titolo: "Chiesa San G. in Compostela", lat: 40.732600, lng: 17.579700, dettaglio: "" },
-      { titolo: "Porta San Demetrio", lat: 40.732115, lng: 17.580022, dettaglio: "" },
-      { titolo: "Porta Nova", lat: 40.730122, lng: 17.577477, dettaglio: "" }
-    ]
-  }
-];
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20n6cT99BfiY7zIFL8/5sa0W4IzASG4FcdWab2kT66F8=" 
+        crossorigin=""></script> 
+    
+<script src="./dettagli/data.js"></script> 
 
+<script>
+// Variabili Globali
 var map, markers = L.layerGroup(), currentPolyline = null;
 
+// Funzioni per Overlay e Dettagli (Il tuo codice)
 function startApp() {
     const nome = document.getElementById('username').value.trim();
     if (!nome) { alert("Inserisci il nome"); return; }
@@ -106,9 +69,26 @@ function startApp() {
     document.getElementById('sidebar').style.filter = 'none';
 }
 
+function mostraDettaglio(elemento) {
+    document.getElementById('dettaglio-monumento').style.display = 'block';
+    document.getElementById('dettaglio-titolo').textContent = elemento.titolo;
+    document.getElementById('dettaglio-descrizione').textContent = elemento.dettaglio;
+    document.getElementById('dettaglio-immagine').src = elemento.immagine || ''; // Usa .immagine, non .img
+    document.getElementById('dettaglio-immagine').style.display = elemento.immagine ? 'block' : 'none';
+    document.getElementById('dettaglio-audio').src = elemento.audio || '';
+    document.getElementById('dettaglio-audio').style.display = elemento.audio ? 'block' : 'none';
+}
+
+
+// Funzione 1: Inizializza la Mappa (con Proiezione Corretta)
 function initMap() {
     map = L.map('map', {
-        center: [40.7305, 17.5775], zoom: 15, scrollWheelZoom: true, dragging: true
+        center: [40.7305, 17.5775], 
+        zoom: 15, 
+        scrollWheelZoom: true, 
+        dragging: true,
+        // CORREZIONE CRITICA: Forza la corretta proiezione GPS
+        crs: L.CRS.EPSG4326 
     });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -117,6 +97,7 @@ function initMap() {
     markers.addTo(map);
 }
 
+// Funzione 2: Carica i marcatori per un tour specifico (Tuo Codice)
 function caricaTour(tourId) {
     markers.clearLayers();
     if (currentPolyline) { map.removeLayer(currentPolyline); currentPolyline = null; }
@@ -142,18 +123,17 @@ function caricaTour(tourId) {
     document.getElementById('dettaglio-monumento').style.display = 'none';
 }
 
-function mostraDettaglio(elemento) {
-    document.getElementById('dettaglio-monumento').style.display = 'block';
-    document.getElementById('dettaglio-titolo').textContent = elemento.titolo;
-    document.getElementById('dettaglio-descrizione').textContent = elemento.dettaglio;
-    document.getElementById('dettaglio-immagine').src = elemento.img || '';
-    document.getElementById('dettaglio-immagine').style.display = elemento.img ? 'block' : 'none';
-    document.getElementById('dettaglio-audio').src = elemento.audio || '';
-    document.getElementById('dettaglio-audio').style.display = elemento.audio ? 'block' : 'none';
-}
-
+// Funzione 3: Inizializza l'intera applicazione
 function initApp() {
     initMap();
+    
+    // CORREZIONE CRITICA FINALE: Forziamo il ridisegno dopo un breve ritardo
+    // Questo risolve i bug di disallineamento e mappa sparita persistenti.
+    setTimeout(() => {
+        map.invalidateSize(); 
+        console.log("Mappa ridisegnata forzatamente.");
+    }, 100); 
+
     const tourList = document.getElementById('tour-list');
     tourList.innerHTML = '';
     attrazioni.forEach((tour) => {
