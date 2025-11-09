@@ -4,191 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ostuni Guida Turistica Interattiva</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-          integrity="sha256-p4NxAoJBhIINfBIHPZgW1ZefU4MoSA6gDLp3zEhec2Y=" 
-          crossorigin=""/>
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden; 
-        }
-        #sidebar {
-            width: 300px;
-            padding: 20px;
-            background-color: #f8f8f8;
-            overflow-y: auto; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-        #map {
-            flex-grow: 1; 
-            height: 100%;
-        }
-        #tour-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-        }
-        #tour-list li {
-            background-color: #fff;
-            margin-bottom: 8px;
-            padding: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #tour-list li:hover {
-            background-color: #e0e0e0;
-        }
-        #dettaglio-monumento {
-            margin-top: 20px;
-            padding: 15px;
-            border-top: 1px solid #ccc;
-        }
-        #dettaglio-monumento h3 {
-            margin-top: 0;
-            color: #1a73e8; 
-        }
-        #dettaglio-monumento img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden;}
+        #sidebar { width: 300px; padding: 20px; background-color: #f8f8f8; overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.1);}
+        #map { flex-grow: 1; height: 100%; }
+        #tour-list { list-style: none; padding: 0; margin-top: 20px;}
+        #tour-list li { background-color: #fff; margin-bottom: 8px; padding: 10px; border-radius: 4px; cursor: pointer; transition: background-color 0.2s;}
+        #tour-list li:hover, #tour-list li.selected { background-color: #bbdefb;}
+        #dettaglio-monumento { margin-top: 20px; padding: 15px; border-top: 1px solid #ccc;}
+        #dettaglio-monumento h3 { margin-top: 0; color: #1a73e8; }
+        #dettaglio-monumento img { max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 10px;}
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; justify-content: center; align-items: center;}
+        #overlay-box { background: white; padding: 28px 30px 18px 30px; border-radius: 10px; width: 100%; max-width: 340px; text-align:center;}
+        @media (max-width: 800px) { #sidebar {width: 100vw; max-width: none;} body{flex-direction: column;}}
     </style>
 </head>
 <body>
 
-    <div id="sidebar">
-        <h2>Ostuni: Tour Interattivo</h2>
-        <p>Seleziona un tour dalla lista:</p>
-        
-        <ul id="tour-list">
-            </ul>
+<!-- Overlay di registrazione -->
+<div id="overlay">
+  <div id="overlay-box">
+    <h2>Benvenuto/a!</h2>
+    <p>Per iniziare inserisci il tuo nome:</p>
+    <input id="username" type="text" placeholder="Nome..." style="width: 100%;margin-bottom:15px;padding:8px;">
+    <button onclick="startApp()" style="padding: 8px 20px; background: #1a73e8; color: white; border-radius: 4px; border: none; font-size: 1em;">Entra</button>
+  </div>
+</div>
 
-        <div id="dettaglio-monumento" style="display: none;">
-            <h3>Dettaglio Monumento</h3>
-            <h4 id="dettaglio-titolo"></h4>
-            <p id="dettaglio-descrizione"></p>
-            <img id="dettaglio-immagine" src="" alt="Immagine Monumento" style="display: none;">
-            <audio id="dettaglio-audio" controls style="width: 100%; display: none;"></audio>
-        </div>
+<div id="sidebar" style="filter: blur(2px);">
+    <h2>Ostuni: Tour Interattivo</h2>
+    <p>Seleziona un tour dalla lista:</p>
+    <ul id="tour-list"></ul>
+    <div id="dettaglio-monumento" style="display: none;">
+        <h3>Dettaglio Monumento</h3>
+        <h4 id="dettaglio-titolo"></h4>
+        <p id="dettaglio-descrizione"></p>
+        <img id="dettaglio-immagine" src="" alt="Immagine Monumento" style="display: none;">
+        <audio id="dettaglio-audio" controls style="width:100%;display:none;"></audio>
     </div>
+</div>
+<div id="map"></div>
 
-    <div id="map">
-        </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const attrazioni = [
+  {
+    id: "monumentale",
+    nome: "Ostuni Monumentale",
+    elementi: [
+      { titolo: "Obelisco di S. Oronzo", lat: 40.732912, lng: 17.579914, dettaglio: "" },
+      { titolo: "Chiesa dello Spirito Santo", lat: 40.731858, lng: 17.580365, dettaglio: "" },
+      { titolo: "Palazzo Municipale", lat: 40.732242, lng: 17.579801, dettaglio: "" },
+      { titolo: "Chiesa San F. d'Assisi", lat: 40.731241, lng: 17.579421, dettaglio: "" },
+      { titolo: "Cattedrale", lat: 40.730679, lng: 17.577959, dettaglio: "" },
+      { titolo: "Chiesa Santa M. della Stella", lat: 40.72879, lng: 17.57660, dettaglio: "" },
+      { titolo: "Chiesa San Pietro", lat: 40.730681, lng: 17.577206, dettaglio: "" },
+      { titolo: "Chiesa Madonna del Carmine", lat: 40.731088, lng: 17.578853, dettaglio: "" }
+    ]
+  },
+  {
+    id: "palazzi",
+    nome: "Ostuni Segreta e Palazzi",
+    elementi: [
+      { titolo: "Palazzo Ayroldi", lat: 40.731644, lng: 17.579799, dettaglio: "" },
+      { titolo: "Palazzo Siccodà", lat: 40.730411, lng: 17.578463, dettaglio: "" },
+      { titolo: "Portale palazzo Bizantizzi", lat: 40.731275, lng: 17.579023, dettaglio: "" },
+      { titolo: "Portale palazzo Ghionda", lat: 40.731523, lng: 17.579082, dettaglio: "" },
+      { titolo: "Portale palazzo Falgheri", lat: 40.731583, lng: 17.579032, dettaglio: "" },
+      { titolo: "Portale palazzo della Musica", lat: 40.729971, lng: 17.578700, dettaglio: "" },
+      { titolo: "Portale palazzo Palmieri", lat: 40.729408, lng: 17.578116, dettaglio: "" },
+      { titolo: "Portale palazzo Jurleo", lat: 40.728880, lng: 17.578260, dettaglio: "" },
+      { titolo: "Portale palazzo Calamo", lat: 40.729250, lng: 17.578050, dettaglio: "" },
+      { titolo: "Portale palazzo Mileti", lat: 40.729350, lng: 17.577980, dettaglio: "" }
+    ]
+  },
+  {
+    id: "panorama",
+    nome: "Ostuni Insolita e Panoramica",
+    elementi: [
+      { titolo: "Stemma degli Zevallos", lat: 40.731100, lng: 17.579522, dettaglio: "" },
+      { titolo: "Capitello Corinzio", lat: 40.731520, lng: 17.579985, dettaglio: "" },
+      { titolo: "Convento delle Monacelle", lat: 40.730763, lng: 17.577680, dettaglio: "" },
+      { titolo: "Chiesa Monacelle/Museo", lat: 40.730763, lng: 17.577680, dettaglio: "" },
+      { titolo: "Volta di Federico II", lat: 40.730800, lng: 17.577400, dettaglio: "" },
+      { titolo: "La Loggia, palazzo Vescovile", lat: 40.730700, lng: 17.577500, dettaglio: "" },
+      { titolo: "Largo Pappadà", lat: 40.731678, lng: 17.579542, dettaglio: "" },
+      { titolo: "Chiesa San G. in Compostela", lat: 40.732600, lng: 17.579700, dettaglio: "" },
+      { titolo: "Porta San Demetrio", lat: 40.732115, lng: 17.580022, dettaglio: "" },
+      { titolo: "Porta Nova", lat: 40.730122, lng: 17.577477, dettaglio: "" }
+    ]
+  }
+];
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-            integrity="sha256-20n6cT99BfiY7zIFL8/5sa0W4IzASG4FcdWab2kT66F8=" 
-            crossorigin=""></script> 
-    
-    <script src="./dettagli/data.js"></script>
+var map, markers = L.layerGroup(), currentPolyline = null;
 
-    <script>
-        // Variabili Globali
-        var map;
-        var markers = L.layerGroup();
-        var currentPolyline = null; 
+function startApp() {
+    const nome = document.getElementById('username').value.trim();
+    if (!nome) { alert("Inserisci il nome"); return; }
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('sidebar').style.filter = 'none';
+}
 
-        // Funzione 1: Inizializza la Mappa (Layer OSM Standard e Proiezione WGS84)
-        function initMap() {
-            // Inizializza la mappa forzando la proiezione WGS84 (EPSG:4326) e interattività
-            map = L.map('map', {
-                center: [40.7305, 17.5755], 
-                zoom: 15,                   
-                scrollWheelZoom: true,      
-                dragging: true,             
-                crs: L.CRS.EPSG4326 // CORREZIONE CRITICA: Forziamo la proiezione GPS standard
-            }); 
+function initMap() {
+    map = L.map('map', {
+        center: [40.7305, 17.5775], zoom: 15, scrollWheelZoom: true, dragging: true
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    markers.addTo(map);
+}
 
-            // Aggiunge il layer Standard OpenStreetMap (massima compatibilità)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            // Aggiunge il layer dei marcatori alla mappa
-            markers.addTo(map);
+function caricaTour(tourId) {
+    markers.clearLayers();
+    if (currentPolyline) { map.removeLayer(currentPolyline); currentPolyline = null; }
+    const tour = attrazioni.find(t => t.id === tourId);
+    if (tour) {
+        let tourCoordinates = [];
+        tour.elementi.forEach(el => {
+            tourCoordinates.push([el.lat, el.lng]);
+            const marker = L.marker([el.lat, el.lng])
+              .bindPopup(`<b>${el.titolo}</b>`)
+              .on('click', () => mostraDettaglio(el));
+            markers.addLayer(marker);
+        });
+        if (tourCoordinates.length > 1) {
+            currentPolyline = L.polyline(tourCoordinates, { color: 'blue', weight: 4, opacity: 0.6 }).addTo(map);
         }
+        let bounds = L.latLngBounds(tourCoordinates);
+        map.fitBounds(bounds, {padding: [50,50]});
+    }
+    Array.from(document.getElementById('tour-list').children).forEach(li => li.classList.remove('selected'));
+    const idx = attrazioni.findIndex(t => t.id === tourId);
+    if (idx !== -1) document.getElementById('tour-list').children[idx].classList.add('selected');
+    document.getElementById('dettaglio-monumento').style.display = 'none';
+}
 
-        // Funzione 2: Calcola e adatta la mappa per mostrare tutti i marcatori
-        function fitMapToAllMarkers() {
-            let allCoordinates = [];
+function mostraDettaglio(elemento) {
+    document.getElementById('dettaglio-monumento').style.display = 'block';
+    document.getElementById('dettaglio-titolo').textContent = elemento.titolo;
+    document.getElementById('dettaglio-descrizione').textContent = elemento.dettaglio;
+    document.getElementById('dettaglio-immagine').src = elemento.img || '';
+    document.getElementById('dettaglio-immagine').style.display = elemento.img ? 'block' : 'none';
+    document.getElementById('dettaglio-audio').src = elemento.audio || '';
+    document.getElementById('dettaglio-audio').style.display = elemento.audio ? 'block' : 'none';
+}
 
-            attrazioni.forEach(tour => {
-                tour.elementi.forEach(el => {
-                    allCoordinates.push([el.lat, el.lng]);
-                });
-            });
+function initApp() {
+    initMap();
+    const tourList = document.getElementById('tour-list');
+    tourList.innerHTML = '';
+    attrazioni.forEach((tour) => {
+        const li = document.createElement('li');
+        li.textContent = tour.nome;
+        li.onclick = () => caricaTour(tour.id);
+        tourList.appendChild(li);
+    });
+}
 
-            if (allCoordinates.length > 0) {
-                let bounds = L.latLngBounds(allCoordinates);
-                map.fitBounds(bounds, { padding: [50, 50] });
-            } else {
-                map.setView([40.7305, 17.5755], 15); 
-            }
-        }
-
-        // Funzione 3: Carica i marcatori per un tour specifico
-        function caricaTour(tourId) {
-            markers.clearLayers();
-            if (currentPolyline) {
-                map.removeLayer(currentPolyline);
-                currentPolyline = null;
-            }
-            
-            const tour = attrazioni.find(t => t.id === tourId);
-
-            if (tour) {
-                let tourCoordinates = [];
-
-                tour.elementi.forEach(elemento => {
-                    tourCoordinates.push([elemento.lat, elemento.lng]);
-
-                    const marker = L.marker([elemento.lat, elemento.lng])
-                        .bindPopup(`<b>${elemento.titolo}</b><br>${elemento.dettaglio}`);
-                    markers.addLayer(marker);
-                });
-
-                if (tourCoordinates.length > 0) {
-                    let bounds = L.latLngBounds(tourCoordinates);
-                    map.fitBounds(bounds, { padding: [50, 50] });
-                }
-            }
-        }
-
-        // Funzione 4: Inizializza l'intera applicazione
-        function initApp() {
-            if (typeof attrazioni === 'undefined') {
-                console.error("ERRORE: Impossibile caricare data.js. Verifica il percorso del file.");
-                return;
-            }
-
-            initMap(); 
-            
-            // CORREZIONE SCOMPARSA MAPPA: Forziamo la mappa a ricalcolare le dimensioni e a disegnarsi
-            map.invalidateSize(); 
-
-            const tourList = document.getElementById('tour-list');
-            
-            attrazioni.forEach(tour => {
-                const li = document.createElement('li');
-                li.textContent = tour.nome;
-                li.onclick = () => caricaTour(tour.id);
-                tourList.appendChild(li);
-            });
-
-            // Lasciamo la centratura automatica disattivata per evitare il disallineamento
-            // fitMapToAllMarkers(); 
-        }
-
-        // Avvia l'applicazione quando il DOM è pronto
-        document.addEventListener('DOMContentLoaded', initApp);
-
-    </script>
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
 </body>
 </html>
