@@ -3,197 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ostuni: Guida Principale</title>
+    <title>Viaggiatore Smart City: Ostuni</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'ostuni-blue': '#1e40af',
-                        'ostuni-light-blue': '#3b82f6',
-                        'ostuni-white': '#fefefe',
-                        'ostuni-grey': '#f3f4f6',
-                        'ostuni-accent': '#FFD700',
-                    }
-                }
-            }
-        }
-    </script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    
     <style>
-        body { background-color: #f3f4f6; font-family: 'Inter', sans-serif; min-height: 100vh; }
-        .icon { width: 20px; height: 20px; }
-        .header-bg { 
-            background-image: url('https://images.unsplash.com/photo-1594917409252-f1981e7d0e4f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); 
-            background-size: cover; background-attachment: fixed; background-position: center; height: 250px; position: relative;
+        body { 
+            background-color: #F8F8F8; 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
         }
-        .header-overlay { 
-            background: linear-gradient(180deg, rgba(30, 64, 175, 0.7) 0%, rgba(59, 130, 246, 0.5) 100%);
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1rem;
+        .icon { width: 32px; height: 32px; color: #1E40AF; }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 10px 0; border-radius: 8px; text-transform: uppercase;
+            font-size: 10px; font-weight: 600; color: #4B5563; 
+        }
+        .tab-button.active { color: #1E40AF; background-color: #DBEAFE; }
+        .tab-button:hover:not(.active) { background-color: #F3F4F6; }
+
+        .attraction-card {
+            background-color: white; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            padding: 16px; transition: transform 0.2s ease;
+        }
+        .attraction-card:hover { transform: translateY(-2px); }
+
+        /* Stile pannelli scorrevoli (Dettaglio e Mappa) */
+        #detail-panel, #map-panel {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #F8F8F8; z-index: 20;
+            transform: translateX(100%); 
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto; 
+        }
+        #detail-panel.active, #map-panel.active { transform: translateX(0); }
+        .audio-container { 
+            background-color: #f3ffce; 
+            padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;
+        }
+
+        /* NUOVO: Stile per il div della Mappa */
+        #map {
+            height: 100vh; /* La mappa occupa l'intera altezza del pannello */
+            width: 100%;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body onload="initApp()">
 
-    <div id="app" class="max-w-4xl mx-auto bg-ostuni-white shadow-2xl rounded-xl overflow-hidden mt-4 mb-4">
-        
-        <header class="header-bg rounded-t-xl">
-            <div class="header-overlay text-ostuni-white rounded-t-xl">
-                <h1 class="text-5xl font-extrabold text-center tracking-tight drop-shadow-lg">OSTUNI: La Guida</h1>
-                <p class="text-center mt-2 text-md font-light">Esplora la Città Bianca con pagine collegate.</p>
+    <header id="main-header" class="bg-blue-700 text-white shadow-xl sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">Viaggiatore Smart City</h1>
+            <button onclick="showMap()" class="text-white text-sm opacity-90 p-1 rounded-lg hover:bg-blue-600 transition duration-150">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <div id="main-content" class="max-w-4xl mx-auto p-4 pt-6">
+
+        <div id="welcome-card" class="bg-white p-5 rounded-xl shadow-lg mb-6 border-l-4 border-blue-500">
             </div>
-        </header>
-
-        <nav id="nav-tabs" class="flex flex-wrap justify-center border-b border-ostuni-grey bg-white p-2">
-            </nav>
-
-        <main id="content-area" class="p-4 sm:p-6 bg-ostuni-white min-h-[400px]">
-            <div id="loading-message" class="text-center p-10 text-gray-500">Caricamento delle attrazioni...</div>
-            <div id="section-content"></div>
-        </main>
         
-        <footer class="bg-gray-100 p-4 text-center text-xs text-gray-500 rounded-b-xl">
-            Ogni dettaglio è ora una pagina HTML separata.
-        </footer>
+        <div class="flex justify-around bg-white rounded-xl shadow-lg mb-6 p-2 border-b border-gray-200">
+            <button id="tab-barocco" class="tab-button w-1/3" onclick="changeSection('barocco')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-8-4.5v-9L12 3l8 4.5v9L12 21z"></path></svg>
+                Barocco
+            </button>
+            <button id="tab-mura" class="tab-button w-1/3" onclick="changeSection('mura')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 17h16M4 17l6-6M4 17l6 6M10 11v6m0-6l6-6m0 6l-6-6m6 6V7"></path></svg>
+                Panorami
+            </button>
+            <button id="tab-sapori" class="tab-button w-1/3" onclick="changeSection('sapori')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM12 6.5V18m0-11.5L8 10l4 3.5 4-3.5"></path></svg>
+                Sapori
+            </button>
+        </div>
+
+        <div id="content-container">
+            <div id="current-description" class="p-4 mb-4 bg-yellow-100 rounded-lg text-gray-700 border-l-4 border-yellow-500 font-medium text-sm"></div>
+            <ul id="attraction-list" class="space-y-4">
+                </ul>
+        </div>
     </div>
 
+    <div id="detail-panel" class="p-4 sm:p-8">
+        <header class="bg-blue-700 text-white shadow-xl sticky top-0 z-10 p-4 mb-4 flex items-center">
+            <button onclick="hideDetail()" class="text-white mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </button>
+            <h2 id="detail-title-header" class="text-xl font-bold truncate">Dettaglio Attrazione</h2>
+        </header>
+
+        <div id="detail-content" class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden p-6 sm:p-8">
+            </div>
+    </div>
+    
+    <div id="map-panel">
+        <header class="bg-blue-700 text-white shadow-xl sticky top-0 z-10 p-4 flex items-center">
+            <button onclick="hideMap()" class="text-white mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </button>
+            <h2 class="text-xl font-bold">Mappa Itinerari Ostuni</h2>
+        </header>
+        <div id="map"></div>
+    </div>
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20n6a9c8z8+p4u7s+j8x2e1uA4gH4m9bA4Xv8gD8v4g="
+        crossorigin=""></script>
+        
+    <script src="dettagli/data.js"></script>
+    
     <script>
-        // --- DATI DELLE ATTRAZIONI: TUTTE LE 32 VOCI SONO COMPLETE DI NOME FILE ---
-        const attrazioni = [
-            {
-                id: 'centro',
-                nome: 'Centro Storico',
-                icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>',
-                descrizione: 'Il labirinto bianco. Esplora i 28 punti storici del centro. Clicca su ogni attrazione per aprire la sua pagina di dettaglio.',
-                elementi: [
-                    { numero: 1, titolo: 'Obelisco di S. Oronzo', dettaglio: 'Monumento votivo in stile barocco, alto quasi 21 metri.', file: 'obelisco.html' },
-                    { numero: 2, titolo: 'Chiesa dello Spirito Santo', dettaglio: 'Una delle chiese più antiche, caratterizzata da un bellissimo portale rinascimentale.', file: 'spiritosanto.html' },
-                    { numero: 3, titolo: 'Palazzo Municipale', dettaglio: 'Antico convento francescano, oggi sede del Municipio.', file: 'palazzomunicipale.html' },
-                    { numero: 4, titolo: 'Chiesa San F. d\'Assisi', dettaglio: 'Esempio di architettura barocca, costruita sul sito di una preesistente chiesa medievale.', file: 'sanfrancesco.html' },
-                    { numero: 5, titolo: 'Stemma degli Zevallos', dettaglio: 'Uno stemma nobiliare che decora uno dei palazzi storici più importanti.', file: 'stemmazevallos.html' },
-                    { numero: 6, titolo: 'Palazzo Ayroldi', dettaglio: 'Un imponente palazzo storico che si distingue per la sua elegante facciata.', file: 'palazzoayroldi.html' },
-                    { numero: 7, titolo: 'Palazzo Siccodà', dettaglio: 'Esempio di residenza nobiliare nel cuore del centro storico.', file: 'palazzosicconda.html' },
-                    { numero: 8, titolo: 'Capitello Corinzio', dettaglio: 'Antico elemento architettonico, probabilmente un resto di un tempio.', file: 'capitello.html' },
-                    { numero: 9, titolo: 'Convento delle Monacelle', dettaglio: 'Storico convento che oggi è un importante edificio pubblico o residenziale.', file: 'monacelleconvento.html' },
-                    { numero: 10, titolo: 'Chiesa Monacelle/Museo', dettaglio: 'Chiesa annessa al convento, spesso adibita a ospitare eventi o piccole esposizioni.', file: 'monacellechiesa.html' },
-                    { numero: 11, titolo: 'Volta di Federico II', dettaglio: 'Un arco o passaggio storico che si dice sia legato alla presenza dell\'Imperatore Federico II.', file: 'voltafederico.html' },
-                    { numero: 12, titolo: 'Cattedrale', dettaglio: 'Il simbolo di Ostuni. Famosa per il suo maestoso rosone gotico a 24 raggi.', file: 'cattedrale.html' },
-                    { numero: 13, titolo: 'La Loggia, Palazzo Vescovile', dettaglio: 'L\'elegante loggia con archi che collega la Cattedrale al Palazzo Vescovile.', file: 'loggiavescovile.html' },
-                    { numero: 14, titolo: 'Portale palazzo Bizantizzi', dettaglio: 'Un pregevole portale d\'ingresso in stile barocco di una delle dimore storiche.', file: 'palazzobizantizzi.html' },
-                    { numero: 15, titolo: 'Largo Pappadà', dettaglio: 'Una piccola piazza o slargo caratteristico nel dedalo di vicoli.', file: 'largopappada.html' },
-                    { numero: 16, titolo: 'Portale palazzo Ghionda', dettaglio: 'Magnifico portale di palazzo Ghionda, testimone dell\'architettura nobiliare.', file: 'palazzoghionda.html' },
-                    { numero: 17, titolo: 'Portale palazzo Falgheri', dettaglio: 'Un altro esempio di raffinato portale storico, spesso decorato con stemmi.', file: 'palazzofalgheri.html' },
-                    { numero: 18, titolo: 'Portale palazzo della Musica', dettaglio: 'L\'ingresso del palazzo che ospita la Scuola o l\'Associazione della Musica locale.', file: 'palazzomusica.html' },
-                    { numero: 19, titolo: 'Portale palazzo Palmieri', dettaglio: 'Uno dei palazzi più noti e imponenti, con un portale d\'ingresso maestoso.', file: 'palazzopalmieri.html' },
-                    { numero: 20, titolo: 'Chiesa San G. in Compostela', dettaglio: 'Piccola chiesa dedicata a San Giacomo di Compostela.', file: 'sangiuseppe.html' },
-                    { numero: 21, titolo: 'Porta San Demetrio', dettaglio: 'Una delle antiche porte di accesso al centro storico fortificato.', file: 'portasandemetrio.html' },
-                    { numero: 22, titolo: 'Portale palazzo Jurleo', dettaglio: 'Un pregevole portale che merita una visita per i suoi dettagli scultorei.', file: 'palazzojurleo.html' },
-                    { numero: 23, titolo: 'Portale palazzo Calamo', dettaglio: 'Suggestivo portale di un altro palazzo storico, incorniciato dal tipico intonaco bianco.', file: 'palazzocalamo.html' },
-                    { numero: 24, titolo: 'Portale palazzo Mileti', dettaglio: 'Esempio di architettura civile barocca ostunese, con balconi decorati.', file: 'palazzomileti.html' },
-                    { numero: 25, titolo: 'Chiesa Santa M. della Stella', dettaglio: 'Chiesa dedicata alla Madonna della Stella, con un interno semplice ma suggestivo.', file: 'madonnastella.html' },
-                    { numero: 26, titolo: 'Porta Nova', dettaglio: 'Una delle porte più recenti o ristrutturate. Da qui si accede al borgo antico.', file: 'portanova.html' },
-                    { numero: 27, titolo: 'Chiesa San Pietro', dettaglio: 'Antica chiesa che contribuisce al panorama architettonico del centro.', file: 'sanpietro.html' },
-                    { numero: 28, titolo: 'Chiesa Madonna del Carmine', dettaglio: 'Una chiesa importante, spesso punto di riferimento nel quartiere.', file: 'madonnacarmine.html' }
-                ]
-            },
-            {
-                id: 'mare',
-                nome: 'Costa e Spiagge',
-                icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
-                descrizione: 'La costa Bandiera Blu di Ostuni. Un litorale vario che offre sia spiagge sabbiose che calette rocciose. Clicca per i dettagli!',
-                elementi: [
-                    { numero: 1, titolo: 'Rosa Marina', dettaglio: 'Rinomata località turistica con ampie spiagge.', file: 'rosamarina.html' },
-                    { numero: 2, titolo: 'Torre Guaceto (Riserva Naturale)', dettaglio: 'Area marina protetta, un paradiso incontaminato.', file: 'torreguaceto.html' }
-                ]
-            },
-            {
-                id: 'dintorni',
-                nome: 'Dintorni e Natura',
-                icon: '<svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>',
-                descrizione: 'Esplora la Piana degli Ulivi Millenari e i siti archeologici appena fuori città. Tutta l\'interazione è a portata di click!',
-                elementi: [
-                    { numero: 1, titolo: 'Parco delle Dune Costiere', dettaglio: 'Un\'area protetta con percorsi naturalistici ideali per escursioni.', file: 'dunecostiere.html' },
-                    { numero: 2, titolo: 'Masseria Brancati', dettaglio: 'Una masseria storica dove è possibile ammirare un ulivo millenario.', file: 'masseriabrancati.html' }
-                ]
-            }
-        ];
+        const detailPanel = document.getElementById('detail-panel');
+        const detailContent = document.getElementById('detail-content');
+        const detailTitleHeader = document.getElementById('detail-title-header');
+        const welcomeCard = document.getElementById('welcome-card');
+        const mapPanel = document.getElementById('map-panel'); // NUOVO: Riferimento al pannello mappa
+        let userName = localStorage.getItem('userName'); 
+        let currentMap = null; // Variabile per tenere l'istanza della mappa
 
-        // --- FUNZIONE MODIFICATA: ORA GENERA LINK <A> VERSO FILE HTML SEPARATI ---
-        function generateContentHTML(sezione) {
-            let html = `<h2 class="text-3xl font-bold mb-4 text-ostuni-blue">${sezione.nome}</h2>`;
-            html += `<p class="mb-6 text-gray-700 italic">${sezione.descrizione}</p>`;
-            
-            sezione.elementi.forEach(el => {
-                // Genera un link <a> se il campo 'file' è presente
-                const linkHref = el.file ? `./dettagli/${el.file}` : '#';
-                const buttonClass = el.file ? 'bg-white border border-gray-200 shadow hover:shadow-lg hover:border-ostuni-light-blue transition duration-300' : 'bg-gray-100 border border-gray-300 text-gray-500 cursor-default';
-                const svgIcon = el.file ? '<svg class="w-5 h-5 ml-auto text-ostuni-light-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>' : '<svg class="w-5 h-5 ml-auto text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
-
-                html += `
-                    <a href="${linkHref}" class="w-full text-left p-4 mb-3 flex items-center rounded-lg ${buttonClass}">
-                        <span class="text-ostuni-accent text-xl font-extrabold mr-4 flex-shrink-0">${el.numero}.</span>
-                        <div class="list-item-truncate overflow-hidden">
-                            <span class="font-semibold text-lg text-gray-800 block">${el.titolo}</span>
-                            <p class="text-sm text-gray-500 truncate">${el.dettaglio.substring(0, 70)}...</p>
-                        </div>
-                        ${svgIcon}
-                    </a>
-                `;
-            });
-            return html;
-        }
-
-        // --- FUNZIONI DI GESTIONE SEZIONE ---
-        const navTabs = document.getElementById('nav-tabs');
-        const contentArea = document.getElementById('section-content');
-        const loadingMessage = document.getElementById('loading-message');
-
-        function updateActiveTab(id) {
-            document.querySelectorAll('#nav-tabs button').forEach(btn => {
-                btn.classList.remove('bg-ostuni-light-blue', 'text-ostuni-white', 'shadow-md');
-                btn.classList.add('hover:bg-gray-200', 'text-gray-700');
-            });
-            const newActiveTab = document.querySelector(`#tab-${id}`);
-            if (newActiveTab) {
-                newActiveTab.classList.remove('hover:bg-gray-200', 'text-gray-700');
-                newActiveTab.classList.add('bg-ostuni-light-blue', 'text-ostuni-white', 'shadow-md');
-            }
-        }
-
-        function changeSection(id) {
-            const sezione = attrazioni.find(a => a.id === id);
-            if (!sezione) return;
-
-            window.location.hash = id; 
-            updateActiveTab(id);
-            
-            contentArea.innerHTML = generateContentHTML(sezione);
-            document.getElementById('app').scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        function handleRouting() {
-            const hash = window.location.hash.slice(1);
-            const sectionId = attrazioni.find(a => a.id === hash) ? hash : attrazioni[0].id;
-            changeSection(sectionId);
-        }
-
+        // *** Devi ancora aggiungere qui le tue configurazioni Firebase, se le stai usando. ***
+        
         function initApp() {
-            loadingMessage.style.display = 'none';
-
-            attrazioni.forEach(attrazione => {
-                const button = document.createElement('button');
-                button.id = `tab-${attrazione.id}`;
-                button.className = 'flex items-center space-x-2 py-2 px-4 mx-1 my-1 rounded-full text-sm font-medium transition duration-150 ease-in-out text-gray-700 hover:bg-gray-200';
-                button.onclick = () => changeSection(attrazione.id); 
-                button.innerHTML = attrazione.icon + `<span>${attrazione.nome}</span>`;
-                navTabs.appendChild(button);
-            });
-
-            window.onhashchange = handleRouting;
-            handleRouting();
+            renderWelcomeCard();
+            
+            const hash = window.location.hash.replace('#', '');
+            const initialSection = attrazioni.some(s => s.id === hash) ? hash : 'barocco';
+            changeSection(initialSection);
         }
 
-        window.onload = initApp;
+        // --- FUNZIONI DI MAPPA (NUOVE) ---
+
+        function showMap() {
+            mapPanel.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Inizializza la mappa solo la prima volta
+            if (!currentMap) {
+                initMap();
+            } else {
+                // Se la mappa esiste, devi invalidarne la dimensione per farla adattare al div
+                currentMap.invalidateSize();
+            }
+        }
+        
+        function hideMap() {
+            mapPanel.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function initMap() {
+            // Coordinate di Ostuni (Centro storico)
+            const ostuniCoords = [40.7303, 17.5752];
+
+            // 1. Inizializza la Mappa
+            currentMap = L.map('map').setView(ostuniCoords, 15); // 15 è il livello di zoom
+
+            // 2. Aggiungi i Tile Layer (l'aspetto visivo della mappa)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(currentMap);
+
+            // 3. Aggiungi i Marker di tutti i POI (richiede che 'attrazioni' abbia le coordinate)
+            
+            // Per il momento, usiamo solo Obelisco, Cattedrale e Spirito Santo come esempio.
+            // DOVRAI AGGIUNGERE lat, lng all'array 'elementi' in data.js per tutti i POI.
+            const samplePois = [
+                { lat: 40.7301, lng: 17.5755, title: 'Obelisco di S. Oronzo' }, // Obelisco (Piazza Libertà)
+                { lat: 40.7297, lng: 17.5768, title: 'Cattedrale' }, // Cattedrale (cima del colle)
+                { lat: 40.7313, lng: 17.5760, title: 'Chiesa dello Spirito Santo' }, // Spirito Santo
+                // Aggiungi qui le coordinate di tutti gli altri POI
+            ];
+            
+            samplePois.forEach(poi => {
+                L.marker([poi.lat, poi.lng])
+                    .addTo(currentMap)
+                    .bindPopup(`<b>${poi.title}</b><br>Tocca per i dettagli.`);
+            });
+        }
+        
+        // --- LOGICA DI PERSONALIZZAZIONE (Come prima) ---
+        function renderWelcomeCard() {
+            if (userName) {
+                welcomeCard.innerHTML = `
+                    <p class="text-lg font-semibold text-gray-800 mb-1">Ciao, ${userName}! 👋</p>
+                    <p class="text-sm text-gray-500">I tuoi itinerari personalizzati per Ostuni sono pronti.</p>
+                `;
+            } else {
+                welcomeCard.innerHTML = `
+                    <p class="text-base font-semibold text-gray-800 mb-3">Registrati per un'esperienza personalizzata!</p>
+                    <div class="flex space-x-2">
+                        <input id="userNameInput" type="text" placeholder="Inserisci il tuo nome" class="flex-grow p-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <button onclick="registerUser()" class="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-150 flex-shrink-0">
+                            Inizia
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function registerUser() {
+            const inputElement = document.getElementById('userNameInput');
+            const newName = inputElement.value.trim();
+
+            if (newName) {
+                localStorage.setItem('userName', newName);
+                userName = newName;
+                renderWelcomeCard(); 
+            } else {
+                alert('Inserisci un nome valido per iniziare!');
+            }
+        }
+
+        // --- FUNZIONI SPA (Come prima) ---
+        function changeSection(sectionId) {
+            const sectionData = attrazioni.find(s => s.id === sectionId);
+            const listContainer = document.getElementById('attraction-list');
+            const descriptionContainer = document.getElementById('current-description');
+            
+            listContainer.innerHTML = '';
+            descriptionContainer.innerHTML = `<strong>Itinerario ${sectionData.nome}:</strong> ${sectionData.descrizione}`;
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`tab-${sectionId}`).classList.add('active');
+
+            sectionData.elementi.forEach(item => {
+                const listItem = document.createElement('li');
+                
+                listItem.innerHTML = `
+                    <div class="attraction-card">
+                        <a href="#" onclick="showDetail('${item.id}', event)" class="flex justify-between items-center w-full">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-8 h-8 flex items-center justify-center bg-blue-500 text-white font-bold rounded-full flex-shrink-0">
+                                    ${item.numero}
+                                </div>
+                                <div>
+                                    <p class="text-base font-semibold text-gray-800 hover:text-blue-700 transition duration-150">
+                                        ${item.titolo}
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-0.5">${item.dettaglio}</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                `;
+                listContainer.appendChild(listItem);
+            });
+            
+            window.location.hash = sectionId;
+        }
+
+        function showDetail(attractionId, event) {
+            event.preventDefault(); 
+            
+            // getAttractionDetail è definito in data.js
+            const detailHTML = getAttractionDetail(attractionId);
+            
+            detailContent.innerHTML = detailHTML;
+            detailTitleHeader.textContent = getAttractionTitle(attractionId);
+            detailPanel.classList.add('active');
+
+            document.body.style.overflow = 'hidden'; 
+            detailPanel.scrollTop = 0; 
+        }
+
+        function hideDetail() {
+            detailPanel.classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+        }
+
+        function getAttractionTitle(id) {
+            const allElements = attrazioni.flatMap(s => s.elementi);
+            const item = allElements.find(e => e.id === id);
+            return item ? item.titolo : 'Dettaglio';
+        }
 
     </script>
 </body>
