@@ -13,17 +13,17 @@
             margin: 0;
             display: flex;
             height: 100vh;
-            overflow: hidden; /* Impedisce lo scroll di tutta la pagina */
+            overflow: hidden; 
         }
         #sidebar {
             width: 300px;
             padding: 20px;
             background-color: #f8f8f8;
-            overflow-y: auto; /* Permette lo scroll della sidebar */
+            overflow-y: auto; 
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         #map {
-            flex-grow: 1; /* La mappa occupa tutto lo spazio rimanente */
+            flex-grow: 1; 
             height: 100%;
         }
         #tour-list {
@@ -49,7 +49,7 @@
         }
         #dettaglio-monumento h3 {
             margin-top: 0;
-            color: #1a73e8; /* Un colore che spicca */
+            color: #1a73e8; 
         }
         #dettaglio-monumento img {
             max-width: 100%;
@@ -82,23 +82,24 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> 
     
+    <script src="https://unpkg.com/leaflet.gridlayer.googlemnn/leaflet-google.js"></script>
+    
     <script src="./dettagli/data.js"></script>
 
     <script>
         // Variabili Globali
         var map;
         var markers = L.layerGroup();
-        var currentPolyline = null; // Variabile per tracciare i percorsi futuri
+        var currentPolyline = null; 
 
-        // Funzione 1: Inizializza la Mappa (Leaflet)
+        // Funzione 1: Inizializza la Mappa (Ora usa Google Satellite)
         function initMap() {
-            // Inizializza la mappa con una vista centrale predefinita 
+            // Inizializza la mappa 
             map = L.map('map').setView([40.7305, 17.5755], 15); 
 
-            // Aggiunge il layer delle piastrelle (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            // NUOVO: Aggiunge il layer di Google Maps (Satellitare)
+            L.gridLayer.google({
+                type: 'satellite' // Usa 'satellite', 'roadmap', 'hybrid', o 'terrain'
             }).addTo(map);
             
             // Aggiunge il layer dei marcatori alla mappa
@@ -117,20 +118,15 @@
             });
 
             if (allCoordinates.length > 0) {
-                // Crea un oggetto LatLngBounds dai limiti delle coordinate
                 let bounds = L.latLngBounds(allCoordinates);
-                
-                // Adatta la mappa ai limiti calcolati con un padding
                 map.fitBounds(bounds, { padding: [50, 50] });
             } else {
-                // Se non ci sono punti, usa la vista predefinita
                 map.setView([40.7305, 17.5755], 15); 
             }
         }
 
         // Funzione 3: Carica i marcatori per un tour specifico
         function caricaTour(tourId) {
-            // 1. Cancella i marcatori esistenti e il percorso (se presente)
             markers.clearLayers();
             if (currentPolyline) {
                 map.removeLayer(currentPolyline);
@@ -143,39 +139,31 @@
                 let tourCoordinates = [];
 
                 tour.elementi.forEach(elemento => {
-                    // Aggiunge la coordinata alla lista per il centraggio
                     tourCoordinates.push([elemento.lat, elemento.lng]);
 
-                    // Crea e aggiunge il marcatore
                     const marker = L.marker([elemento.lat, elemento.lng])
                         .bindPopup(`<b>${elemento.titolo}</b><br>${elemento.dettaglio}`);
                     markers.addLayer(marker);
                 });
 
-                // 2. Centra la mappa sui punti del tour selezionato
                 if (tourCoordinates.length > 0) {
                     let bounds = L.latLngBounds(tourCoordinates);
                     map.fitBounds(bounds, { padding: [50, 50] });
                 }
-
-                // 3. Prepara per la Polyline (il codice verrà aggiunto qui in futuro)
-                
             }
         }
 
         // Funzione 4: Inizializza l'intera applicazione
         function initApp() {
-            // Verifica che l'array 'attrazioni' sia disponibile
             if (typeof attrazioni === 'undefined') {
                 console.error("ERRORE: Impossibile caricare data.js. Verifica il percorso del file.");
                 return;
             }
 
-            initMap(); // 1. Inizializza la mappa e i layer
+            initMap(); 
             
             const tourList = document.getElementById('tour-list');
             
-            // 2. Popola la lista dei tour
             attrazioni.forEach(tour => {
                 const li = document.createElement('li');
                 li.textContent = tour.nome;
@@ -183,7 +171,6 @@
                 tourList.appendChild(li);
             });
 
-            // 3. Adatta la mappa per mostrare tutti i marcatori (all'avvio)
             fitMapToAllMarkers(); 
         }
 
