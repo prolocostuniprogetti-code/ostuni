@@ -7,13 +7,30 @@
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <style>
-#map { height: 60vh; width: 100%; }
-.leaflet-popup-content-wrapper { font-family: 'Inter', sans-serif; }
+  #map { height: 60vh; width: 100%; }
+  .leaflet-popup-content-wrapper { font-family: 'Inter', sans-serif; }
+  #overlay {
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.6); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    z-index: 1000;
+  }
 </style>
 </head>
 <body class="bg-gray-50 font-sans">
 
 <header class="bg-blue-900 text-white p-4 text-center font-bold text-xl">Ostuni: La Città Bianca - Guida Interattiva</header>
+
+<div id="overlay">
+  <div class="bg-white p-8 rounded shadow-lg max-w-md w-full text-center">
+    <h2 class="font-bold text-lg mb-4">Registrati per Accedere</h2>
+    <input id="username" type="text" placeholder="Il tuo nome" class="border p-2 mb-4 w-full rounded" />
+    <button id="enterBtn" class="bg-blue-900 text-white px-4 py-2 rounded w-full">Entra</button>
+  </div>
+</div>
 
 <div id="map"></div>
 
@@ -24,81 +41,86 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+// Più precise per il centro storico (Google Maps approximation)
 const attrazioni = [
   {
     id: "cattedrale",
     nome: "Cattedrale di Santa Maria Assunta",
     descrizione: "Famosa per il suo maestoso rosone gotico a 24 raggi sulla sommità del colle.",
-    lat: 40.7292,
-    lng: 17.5947
+    lat: 40.729091,
+    lng: 17.594982
   },
   {
     id: "arco",
     nome: "Arco Scoppa",
     descrizione: "Un elegante ponte in pietra che unisce il Palazzo Vescovile e il Seminario.",
-    lat: 40.7268,
-    lng: 17.5928
+    lat: 40.728189,
+    lng: 17.593222
   },
   {
     id: "porta-blu",
     nome: "Casa con la Porta Blu",
     descrizione: "L'angolo più instagrammato della città, con la sua porta colorata che spicca sul bianco.",
-    lat: 40.7285,
-    lng: 17.5941
+    lat: 40.728758,
+    lng: 17.595057
   },
   {
     id: "mura-aragonesi",
     nome: "Mura Aragonesi",
     descrizione: "Antiche fortificazioni che circondano il centro, offrendo panorami mozzafiato sulla piana degli ulivi.",
-    lat: 40.7276,
-    lng: 17.5960
+    lat: 40.72727,
+    lng: 17.595668
   }
 ];
 
-// Inizializza la mappa
-const map = L.map('map').setView([40.7289, 17.5949], 15);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-// Funzione per creare popup personalizzati e aggiungere marker
-attrazioni.forEach(a => {
-  const marker = L.marker([a.lat, a.lng]).addTo(map);
-  marker.bindPopup(`<strong>${a.nome}</strong><br>${a.descrizione}`);
-
-  // Evento click sincronizzato con lista
-  marker.on('click', () => {
-    selectAttraction(a.id);
-  });
-});
-
-// Genera lista interattiva attrazioni
+// Overlay registrazione
+const overlay = document.getElementById('overlay');
+const mapContainer = document.getElementById('map');
 const listDiv = document.getElementById('attractions-list');
 
-function selectAttraction(id) {
-  // Passa in evidenza elemento selezionato
-  Array.from(listDiv.children).forEach(div => {
-    div.classList.remove('bg-blue-100');
-  });
-  const selectedElem = document.getElementById('item-' + id);
-  if (selectedElem) selectedElem.classList.add('bg-blue-100');
-
-  // Zoom sulla mappa
-  const attr = attrazioni.find(a => a.id === id);
-  if (attr) {
-    map.setView([attr.lat, attr.lng], 17, { animate: true });
-    map.openPopup(L.marker([attr.lat, attr.lng]).getPopup());
+document.getElementById('enterBtn').addEventListener('click', () => {
+  const username = document.getElementById('username').value.trim();
+  if (username.length < 2) {
+    alert('Inserisci un nome valido');
+    return;
   }
+  overlay.style.display = 'none';
+  mapContainer.style.filter = 'none';
+  initializeMap();
+});
+
+function initializeMap() {
+  const map = L.map('map').setView([40.7285, 17.5945], 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  
+  attrazioni.forEach(a => {
+    const marker = L.marker([a.lat, a.lng]).addTo(map);
+    marker.bindPopup(`<strong>${a.nome}</strong><br>${a.descrizione}`);
+    marker.on('click', () => selectAttraction(a.id, map));
+  });
+
+  attrazioni.forEach(a => {
+    const div = document.createElement('div');
+    div.id = 'item-' + a.id;
+    div.className = 'cursor-pointer p-4 border rounded hover:bg-blue-50';
+    div.innerHTML = `<h3 class="font-semibold">${a.nome}</h3><p class="text-sm text-gray-700">${a.descrizione}</p>`;
+    div.onclick = () => selectAttraction(a.id, map);
+    listDiv.appendChild(div);
+  });
 }
 
-attrazioni.forEach(a => {
-  const div = document.createElement('div');
-  div.id = 'item-' + a.id;
-  div.className = 'cursor-pointer p-4 border rounded hover:bg-blue-50';
-  div.innerHTML = `<h3 class="font-semibold">${a.nome}</h3><p class="text-sm text-gray-700">${a.descrizione}</p>`;
-  div.onclick = () => selectAttraction(a.id);
-  listDiv.appendChild(div);
-});
+function selectAttraction(id, map) {
+  Array.from(listDiv.children).forEach(div => div.classList.remove('bg-blue-100'));
+  const selectedElem = document.getElementById('item-' + id);
+  if (selectedElem) selectedElem.classList.add('bg-blue-100');
+  const atr = attrazioni.find(a => a.id === id);
+  if (atr) {
+    map.setView([atr.lat, atr.lng], 18, { animate: true });
+    map.openPopup(L.popup().setLatLng([atr.lat, atr.lng]).setContent(`<strong>${atr.nome}</strong><br>${atr.descrizione}`));
+  }
+}
 </script>
 </body>
 </html>
