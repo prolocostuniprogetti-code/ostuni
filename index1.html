@@ -54,7 +54,7 @@
 
         /* Stile per il div della Mappa */
         #map {
-            height: calc(100vh - 72px); 
+            height: calc(100vh - 72px);
             width: 100%;
         }
     </style>
@@ -162,8 +162,13 @@
 
             if (!currentMap) {
                 initMap();
-            } else {
-                currentMap.invalidateSize();
+            } 
+            
+            // QUESTA È LA SOLUZIONE: Ricalcoliamo le dimensioni della mappa dopo che il pannello è visibile.
+            if (currentMap) {
+                setTimeout(() => {
+                    currentMap.invalidateSize();
+                }, 300); 
             }
         }
         
