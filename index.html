@@ -31,10 +31,10 @@
         <div class="bg-white p-6 rounded-lg shadow-2xl max-w-lg w-full">
             <h2 class="text-2xl font-bold text-red-700 mb-4">🚨 ERRORE CRITICO DI CARICAMENTO 🚨</h2>
             <p id="errore-critico-messaggio" class="text-gray-700 font-semibold">
-                I dati essenziali non sono stati trovati. Verifica che il file 'dettagli/data.js' esista e sia caricato nell'ordine corretto.
+                I dati essenziali non sono stati trovati. Verifica che il percorso 'dettagli/data.js' sia corretto e che il file non contenga errori di sintassi.
             </p>
             <p class="mt-4 text-sm text-gray-500">
-                (Controlla la console del browser per i dettagli sulla causa del fallimento 404 Not Found).
+                (Controlla la console del browser per i dettagli.)
             </p>
         </div>
     </div>
@@ -82,19 +82,16 @@
         }
 
         /**
-         * CRITICAL CHECK: Verifica che data.js sia caricato correttamente
-         * Questo controllo ora avviene DOPO il tag <script src="dettagli/data.js"></script>
+         * CONTROLLO CRITICO: Esegue il controllo subito dopo il caricamento di data.js
          */
         if (typeof attrazioni === 'undefined') {
-            // Se attrazioni non è definito, chiama immediatamente l'handler di errore
-            gestisciErroreCritico("File dati non trovato. Assicurati che il percorso 'dettagli/data.js' sia corretto (anche le maiuscole/minuscole).");
+            // Se attrazioni non è definito, mostra l'errore e ferma tutto
+            gestisciErroreCritico("File dati non trovato. Assicurati che 'dettagli/data.js' sia caricato correttamente (verifica sintassi e percorso).");
         } else {
             // Funzione principale di inizializzazione, esegue il setup solo se i dati sono presenti
             function initApp() {
-                if (typeof attrazioni === 'undefined') {
-                    // Prevenzione: non dovrebbe più accadere qui
-                    return; 
-                }
+                // Aggiungiamo un controllo per evitare doppie inizializzazioni in caso di errore
+                if (typeof map !== 'undefined') return;
 
                 // Inizializzazione della mappa Leaflet
                 map = L.map('map').setView([40.7300, 17.5750], 15); // Centro Ostuni
@@ -109,14 +106,12 @@
                 // Costruisce la lista dei tour nella sidebar
                 renderTourList();
 
-                // Se esiste un ID di tour nella query URL, caricalo
-                const urlParams = new URLSearchParams(window.location.search);
-                const initialTourId = urlParams.get('tour');
-                if (initialTourId) {
-                    caricaTour(initialTourId);
+                // Centra la mappa su tutti i dati (necessario un piccolo hack per i markers vuoti all'inizio)
+                const allLatsLngs = attrazioni.flatMap(t => t.elementi).map(e => [e.lat, e.lng]);
+                if (allLatsLngs.length > 0) {
+                     map.fitBounds(L.latLngBounds(allLatsLngs), { padding: [50, 50] });
                 } else {
-                    // Centra la mappa su tutti i dati (opzionale: zoom out)
-                    map.fitBounds(markers.getBounds(), { padding: [50, 50] });
+                     map.setView([40.7300, 17.5750], 15);
                 }
             }
 
@@ -179,7 +174,7 @@
                 }
             }
 
-            // Funzione per la riproduzione audio (richiede un player audio nell'HTML)
+            // Funzione per la riproduzione audio
             window.playAudio = function(audioFile) {
                 const audio = new Audio(`dettagli/audio/${audioFile}`);
                 audio.play().catch(e => console.error("Errore nella riproduzione audio:", e));
