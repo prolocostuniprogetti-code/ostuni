@@ -15,7 +15,7 @@ const attrazioni = [
                 descrizione_completa: 'Eretta nel Settecento per ringraziare il Santo per aver protetto Ostuni dalla peste, questa colonna alta 20 metri è un capolavoro del barocco locale e un punto d’incontro fondamentale.',
                 immagine: 'sant-oronzo.jpg',
                 audio: 'sant-oronzo.mp3',
-                lat: 40.73010, lng: 17.57635 // Piazza Libertà
+                lat: 40.73010, lng: 17.57635 // Piazza Libertà (Punto 1 sulla mappa utente)
             },
             {
                 id: 'chiesa-spirito-santo',
@@ -55,7 +55,7 @@ const attrazioni = [
                 descrizione_completa: 'Il punto più alto e panoramico della città, un capolavoro di architettura che fonde stili diversi.',
                 immagine: 'cattedrale.jpg',
                 audio: 'cattedrale.mp3',
-                lat: 40.73099, lng: 17.57544 // CIMA DEL COLLE
+                lat: 40.73099, lng: 17.57544 // CIMA DEL COLLE (Punto 12 sulla mappa utente)
             },
             {
                 id: 'chiesa-stella',
