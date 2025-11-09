@@ -1,205 +1,205 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tour Guide App: Ostuni</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Guide App: Ostuni</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossorigin=""/>
-    
-    <style>
-        body { 
-            background-color: #F0F2F5; 
-            font-family: 'Inter', sans-serif; 
-            overflow-x: hidden; 
-            color: #333; 
-            padding-bottom: 70px; /* Spazio per la barra di navigazione fissa */
-        }
-        .icon { width: 24px; height: 24px; color: #6B7280; } 
-        
-        /* Stile Navigazione App (Fissa in fondo) */
-        #app-navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: white;
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 30;
-        }
-        .nav-button {
-            transition: all 0.2s ease;
-            display: flex; flex-direction: column; align-items: center;
-            padding: 8px 0; font-size: 10px; font-weight: 600; color: #6B7280; 
-        }
-        .nav-button.active { color: #054D8F; }
-        .nav-button.active .icon { color: #054D8F; }
-        .nav-button:hover:not(.active) { background-color: #F3F4F6; }
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    
+    <style>
+        body { 
+            background-color: #F0F2F5; 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden; 
+            color: #333; 
+            padding-bottom: 70px; /* Spazio per la barra di navigazione fissa */
+        }
+        .icon { width: 24px; height: 24px; color: #6B7280; } 
+        
+        /* Stile Navigazione App (Fissa in fondo) */
+        #app-navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 30;
+        }
+        .nav-button {
+            transition: all 0.2s ease;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 8px 0; font-size: 10px; font-weight: 600; color: #6B7280; 
+        }
+        .nav-button.active { color: #054D8F; }
+        .nav-button.active .icon { color: #054D8F; }
+        .nav-button:hover:not(.active) { background-color: #F3F4F6; }
 
-        /* Stile migliorato per le card delle attrazioni */
-        .attraction-card {
-            background-color: white; border-radius: 12px;
-            box-shadow: 0 6px 15px -3px rgba(0, 0, 0, 0.08), 0 3px 6px -2px rgba(0, 0, 0, 0.05); 
-            padding: 18px; transition: transform 0.2s ease;
-        }
-        .attraction-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px -3px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.08); }
+        /* Stile migliorato per le card delle attrazioni */
+        .attraction-card {
+            background-color: white; border-radius: 12px;
+            box-shadow: 0 6px 15px -3px rgba(0, 0, 0, 0.08), 0 3px 6px -2px rgba(0, 0, 0, 0.05); 
+            padding: 18px; transition: transform 0.2s ease;
+        }
+        .attraction-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px -3px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.08); }
 
-        /* Stile pannelli scorrevoli (Dettaglio e Mappa) */
-        #detail-panel, #map-panel {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #F0F2F5; z-index: 20;
-            transform: translateX(100%); 
-            transition: transform 0.3s ease-in-out;
-            overflow-y: auto; 
-        }
-        #detail-panel.active, #map-panel.active { transform: translateX(0); }
-        .audio-container { 
-            background-color: #FFFBEB; 
-            border: 1px solid #FDE68A;
-            padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;
-        }
-        #map {
-            height: calc(100vh - 56px); /* Adatta l'altezza togliendo solo l'header mappa */
-            width: 100%;
-        }
-        /* Nasconde tutte le sezioni di contenuto per mostrare solo quella attiva */
-        .app-screen { display: none; }
-        .app-screen.active { display: block; }
+        /* Stile pannelli scorrevoli (Dettaglio e Mappa) */
+        #detail-panel, #map-panel {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #F0F2F5; z-index: 20;
+            transform: translateX(100%); 
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto; 
+        }
+        #detail-panel.active, #map-panel.active { transform: translateX(0); }
+        .audio-container { 
+            background-color: #FFFBEB; 
+            border: 1px solid #FDE68A;
+            padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem;
+        }
+        #map {
+            height: calc(100vh - 56px); /* Adatta l'altezza togliendo solo l'header mappa */
+            width: 100%;
+        }
+        /* Nasconde tutte le sezioni di contenuto per mostrare solo quella attiva */
+        .app-screen { display: none; }
+        .app-screen.active { display: block; }
 
-    </style>
+    </style>
 </head>
 <body onload="initApp()">
 
-    <header id="main-header" class="bg-[#054D8F] text-white shadow-2xl sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
-            <h1 id="header-title" class="text-xl font-bold"></h1>
-            <button onclick="alert('Simulazione: Apertura Scanner QR')" class="text-white text-sm opacity-90 p-1 rounded-lg hover:bg-[#03376B] transition duration-150">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
-            </button>
-        </div>
-    </header>
+    <header id="main-header" class="bg-[#054D8F] text-white shadow-2xl sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 id="header-title" class="text-xl font-bold"></h1>
+            <button onclick="alert('Simulazione: Apertura Scanner QR')" class="text-white text-sm opacity-90 p-1 rounded-lg hover:bg-[#03376B] transition duration-150">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+            </button>
+        </div>
+    </header>
 
-    <div id="main-content" class="max-w-4xl mx-auto p-4 pt-6">
+    <div id="main-content" class="max-w-4xl mx-auto p-4 pt-6">
 
-        <div id="home-screen" class="app-screen active">
-            <div id="welcome-card" class="bg-white p-5 rounded-xl shadow-lg mb-6 border-l-4 border-[#054D8F]">
-                </div>
-            
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Itinerari di Ostuni</h2>
-            
-            <div class="flex justify-around bg-white rounded-xl shadow-lg mb-6 p-2 border-b border-gray-200">
-                <button id="tab-barocco" class="tab-button w-1/3" onclick="changeSection('barocco')">Barocco</button>
-                <button id="tab-mura" class="tab-button w-1/3" onclick="changeSection('mura')">Panorami</button>
-                <button id="tab-sapori" class="tab-button w-1/3" onclick="changeSection('sapori')">Sapori</button>
-            </div>
-            
-            <div id="content-container">
-                <div id="current-description" class="p-4 mb-4 bg-yellow-100 rounded-lg text-gray-700 border-l-4 border-yellow-500 font-medium text-sm"></div>
-                <ul id="attraction-list" class="space-y-4">
-                    </ul>
-            </div>
-            
-            <div class="mt-8 p-5 bg-white rounded-xl shadow-lg border-l-4 border-teal-500">
-                <h3 class="text-lg font-bold mb-3">💬 Chatta con l'Assistente Viaggi</h3>
-                <p class="text-sm text-gray-600 mb-3">Simulazione: Clicca per ricevere un consiglio personalizzato!</p>
-                <button onclick="alert('Chatbot: Ciao! Sono l\'Assistente Viaggi. Posso aiutarti a pianificare la tua visita a Ostuni.')" class="bg-teal-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-teal-600 transition duration-150">
-                    Avvia Chat
-                </button>
-            </div>
-        </div>
+        <div id="home-screen" class="app-screen active">
+            <div id="welcome-card" class="bg-white p-5 rounded-xl shadow-lg mb-6 border-l-4 border-[#054D8F]">
+                </div>
+            
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Itinerari di Ostuni</h2>
+            
+            <div class="flex justify-around bg-white rounded-xl shadow-lg mb-6 p-2 border-b border-gray-200">
+                <button id="tab-barocco" class="tab-button w-1/3" onclick="changeSection('barocco')">Barocco</button>
+                <button id="tab-mura" class="tab-button w-1/3" onclick="changeSection('mura')">Panorami</button>
+                <button id="tab-sapori" class="tab-button w-1/3" onclick="changeSection('sapori')">Sapori</button>
+            </div>
+            
+            <div id="content-container">
+                <div id="current-description" class="p-4 mb-4 bg-yellow-100 rounded-lg text-gray-700 border-l-4 border-yellow-500 font-medium text-sm"></div>
+                <ul id="attraction-list" class="space-y-4">
+                    </ul>
+            </div>
+            
+            <div class="mt-8 p-5 bg-white rounded-xl shadow-lg border-l-4 border-teal-500">
+                <h3 class="text-lg font-bold mb-3">💬 Chatta con l'Assistente Viaggi</h3>
+                <p class="text-sm text-gray-600 mb-3">Simulazione: Clicca per ricevere un consiglio personalizzato!</p>
+                <button onclick="alert('Chatbot: Ciao! Sono l\'Assistente Viaggi. Posso aiutarti a pianificare la tua visita a Ostuni.')" class="bg-teal-500 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-teal-600 transition duration-150">
+                    Avvia Chat
+                </button>
+            </div>
+        </div>
 
-        <div id="bookings-screen" class="app-screen">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">🗓️ Le Tue Prenotazioni</h2>
-            <div class="p-6 bg-white rounded-xl shadow-lg">
-                <p class="text-gray-600">
-                    Questa sezione su un'app nativa mostrerebbe le guide prenotate o i tour confermati. 
-                    Nel sito web è solo un placeholder.
-                </p>
-                <ul class="mt-4 space-y-2">
-                    <li class="bg-gray-50 p-3 border-l-4 border-orange-500 rounded">
-                        <span class="font-semibold">Tour Barocco:</span> Guida Maria (Confermata)
-                    </li>
-                    <li class="bg-gray-50 p-3 border-l-4 border-orange-500 rounded">
-                        <span class="font-semibold">Esperienza Olio EVO:</span> Guida Giovanni (In attesa)
-                    </li>
-                </ul>
-                <button onclick="alert('Simulazione: Vai a Guida al Noleggio')" class="mt-4 bg-orange-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-orange-600">
-                    Prenota Nuova Guida
-                </button>
-            </div>
-        </div>
+        <div id="bookings-screen" class="app-screen">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">🗓️ Le Tue Prenotazioni</h2>
+            <div class="p-6 bg-white rounded-xl shadow-lg">
+                <p class="text-gray-600">
+                    Questa sezione su un'app nativa mostrerebbe le guide prenotate o i tour confermati. 
+                    Nel sito web è solo un placeholder.
+                </p>
+                <ul class="mt-4 space-y-2">
+                    <li class="bg-gray-50 p-3 border-l-4 border-orange-500 rounded">
+                        <span class="font-semibold">Tour Barocco:</span> Guida Maria (Confermata)
+                    </li>
+                    <li class="bg-gray-50 p-3 border-l-4 border-orange-500 rounded">
+                        <span class="font-semibold">Esperienza Olio EVO:</span> Guida Giovanni (In attesa)
+                    </li>
+                </ul>
+                <button onclick="alert('Simulazione: Vai a Guida al Noleggio')" class="mt-4 bg-orange-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-orange-600">
+                    Prenota Nuova Guida
+                </button>
+            </div>
+        </div>
 
-        <div id="profile-screen" class="app-screen">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">👤 Il Tuo Profilo</h2>
-            <div class="p-6 bg-white rounded-xl shadow-lg space-y-4">
-                <p class="text-sm font-semibold text-gray-700">Utente Corrente: <span id="profile-username" class="font-bold text-[#054D8F]">Ospite</span></p>
-                
-                <button onclick="alert('Simulazione: Modifica Dati Account')" class="w-full text-left p-3 bg-gray-50 rounded hover:bg-gray-100 transition border-l-4 border-gray-400">
-                    Gestisci Account e Sicurezza
-                </button>
-                <button onclick="alert('Simulazione: Visualizza Album di Viaggio')" class="w-full text-left p-3 bg-gray-50 rounded hover:bg-gray-100 transition border-l-4 border-gray-400">
-                    Album di Viaggio (Carica/Visualizza)
-                </button>
-                <button onclick="localStorage.removeItem('userName'); initApp(); setActiveScreen('home-screen');" class="w-full text-left p-3 bg-red-100 text-red-700 font-semibold rounded hover:bg-red-200 transition border-l-4 border-red-500">
-                    Logout
-                </button>
-                <button onclick="alert('Simulazione: Vai al Centro Assistenza')" class="w-full text-left p-3 bg-gray-50 rounded hover:bg-gray-100 transition border-l-4 border-gray-400">
-                    Centro Assistenza e FAQ
-                </button>
-            </div>
-        </div>
-        
-    </div>
+        <div id="profile-screen" class="app-screen">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">👤 Il Tuo Profilo</h2>
+            <div class="p-6 bg-white rounded-xl shadow-lg space-y-4">
+                <p class="text-sm font-semibold text-gray-700">Utente Corrente: <span id="profile-username" class="font-bold text-[#054D8F]">Ospite</span></p>
+                
+                <button onclick="alert('Simulazione: Modifica Dati Account')" class="w-full text-left p-3 bg-gray-50 rounded hover:bg-gray-100 transition border-l-4 border-gray-400">
+                    Gestisci Account e Sicurezza
+                </button>
+                <button onclick="alert('Simulazione: Visualizza Album di Viaggio')" class="w-full text-left p-3 bg-gray-50 rounded hover:bg-gray-100 transition border-l-4 border-gray-400">
+                    Album di Viaggio (Carica/Visualizza)
+                </button>
+                <button onclick="localStorage.removeItem('userName'); initApp(); setActiveScreen('home-screen');" class="w-full text-left p-3 bg-red-100 text-red-700 font-semibold rounded hover:bg-red-200 transition border-l-4 border-red-500">
+                    Logout
+                </button>
+                <button onclick="alert('Simulazione: Vai al Centro Assistenza')" class="w-full text-left p-3 bg-gray-50 rounded hover:bg-gray-100 transition border-l-4 border-gray-400">
+                    Centro Assistenza e FAQ
+                </button>
+            </div>
+        </div>
+        
+    </div>
 
-    <nav id="app-navbar" class="max-w-4xl mx-auto">
-        <div class="flex justify-around">
-            <button id="nav-home" class="nav-button w-1/4 active" onclick="setActiveScreen('home-screen')">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m-7-7h14m-7 0v10"></path></svg>
-                <span>Home</span>
-            </button>
-            <button id="nav-map" class="nav-button w-1/4" onclick="showMap()">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span>Mappa</span>
-            </button>
-            <button id="nav-bookings" class="nav-button w-1/4" onclick="setActiveScreen('bookings-screen')">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 4V3M3 10h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span>Prenotazioni</span>
-            </button>
-            <button id="nav-profile" class="nav-button w-1/4" onclick="setActiveScreen('profile-screen')">
-                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                <span>Profilo</span>
-            </button>
-        </div>
-    </nav>
-    
-    <div id="detail-panel" class="p-4 sm:p-8">
-        <header class="bg-[#054D8F] text-white shadow-xl sticky top-0 z-10 p-4 mb-4 flex items-center">
-            <button onclick="hideDetail()" class="text-white mr-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            </button>
-            <h2 id="detail-title-header" class="text-xl font-bold truncate">Dettaglio Attrazione</h2>
-        </header>
-        <div id="detail-content" class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden p-6 sm:p-8">
-            </div>
-    </div>
-    
-    <div id="map-panel">
-        <header class="bg-[#054D8F] text-white shadow-xl sticky top-0 z-10 p-4 flex items-center">
-            <button onclick="hideMap()" class="text-white mr-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            </button>
-            <h2 class="text-xl font-bold">Mappa Itinerari Ostuni</h2>
-        </header>
-        <div id="map"></div>
-    </div>
+    <nav id="app-navbar" class="max-w-4xl mx-auto">
+        <div class="flex justify-around">
+            <button id="nav-home" class="nav-button w-1/4 active" onclick="setActiveScreen('home-screen')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m-7-7h14m-7 0v10"></path></svg>
+                <span>Home</span>
+            </button>
+            <button id="nav-map" class="nav-button w-1/4" onclick="showMap()">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Mappa</span>
+            </button>
+            <button id="nav-bookings" class="nav-button w-1/4" onclick="setActiveScreen('bookings-screen')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 4V3M3 10h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span>Prenotazioni</span>
+            </button>
+            <button id="nav-profile" class="nav-button w-1/4" onclick="setActiveScreen('profile-screen')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <span>Profilo</span>
+            </button>
+        </div>
+    </nav>
+    
+    <div id="detail-panel" class="p-4 sm:p-8">
+        <header class="bg-[#054D8F] text-white shadow-xl sticky top-0 z-10 p-4 mb-4 flex items-center">
+            <button onclick="hideDetail()" class="text-white mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </button>
+            <h2 id="detail-title-header" class="text-xl font-bold truncate">Dettaglio Attrazione</h2>
+        </header>
+        <div id="detail-content" class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden p-6 sm:p-8">
+            </div>
+    </div>
+    
+    <div id="map-panel">
+        <header class="bg-[#054D8F] text-white shadow-xl sticky top-0 z-10 p-4 flex items-center">
+            <button onclick="hideMap()" class="text-white mr-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </button>
+            <h2 class="text-xl font-bold">Mappa Itinerari Ostuni</h2>
+        </header>
+        <div id="map"></div>
+    </div>
 
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -218,10 +218,11 @@
         let userName = localStorage.getItem('userName'); 
         let currentMap = null; 
         
+        // Funzione di inizializzazione principale
         function initApp() {
-            // Verifica che data.js sia caricato correttamente
+            // CRITICAL CHECK: Verifica che data.js sia caricato correttamente
             if (typeof attrazioni === 'undefined') {
-                 // Mostra messaggio di errore se data.js non è trovato
+                console.error("ERRORE: Variabile 'attrazioni' non trovata. Controlla il nome del file 'dettagli/data.js'.");
                 document.getElementById('main-content').innerHTML = `
                     <div class="p-6 bg-red-100 border-l-4 border-red-500 text-red-700 font-bold rounded-lg">
                         ERRORE CRITICO: File dati non trovato. Assicurati che il file nella cartella 'dettagli/' si chiami ESATTAMENTE 'data.js'.
@@ -234,13 +235,16 @@
             renderWelcomeCard();
             setActiveScreen('home-screen'); 
             
-            // Re-inizializza la sezione itinerari (che ora è solo su Home)
-            const initialSection = 'barocco';
-            changeSection(initialSection);
+            // Re-inizializza la sezione itinerari
+            changeSection('barocco');
         }
 
-        // --- GESTIONE SCHERMATE (NUOVA FUNZIONE) ---
+        // --- GESTIONE SCHERMATE ---
         function setActiveScreen(screenId) {
+            // Nasconde l'overlay della Mappa se attivo (Importante per il Navigatore)
+            mapPanel.classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+        
             document.querySelectorAll('.app-screen').forEach(screen => {
                 screen.classList.remove('active');
             });
@@ -259,12 +263,11 @@
             };
             headerTitle.textContent = titles[screenId] || 'Tour Guide App';
             
-            // Aggiorna il nome nel profilo
             if (screenId === 'profile-screen') {
                 document.getElementById('profile-username').textContent = userName || 'Ospite (Non Registrato)';
             }
             
-            window.scrollTo(0, 0); // Torna in cima alla nuova schermata
+            window.scrollTo(0, 0);
         }
         
         // --- LOGICA DI LOGIN/REGISTRAZIONE ---
@@ -291,7 +294,7 @@
         function registerUser() {
             const inputElement = document.getElementById('userNameInput');
             const email = inputElement.value.trim();
-            const name = email.split('@')[0]; // Prende il nome dall'email per la simulazione
+            const name = email.split('@')[0];
 
             if (email && email.includes('@')) {
                 localStorage.setItem('userName', name);
@@ -305,6 +308,16 @@
         // --- FUNZIONI MAPPA (CORRETTE) ---
 
         function showMap() {
+             // Nasconde tutte le schermate attive e deseleziona i pulsanti Nav
+            document.querySelectorAll('.app-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+             // Attiva il pulsante Mappa
+            document.getElementById('nav-map').classList.add('active');
+            
             mapPanel.classList.add('active');
             document.body.style.overflow = 'hidden';
 
@@ -312,6 +325,7 @@
                 initMap();
             } 
             
+            // CRITICAL FIX: Forza il ricalcolo delle dimensioni della mappa (per risolvere il problema del pannello bianco)
             if (currentMap) {
                 setTimeout(() => {
                     currentMap.invalidateSize();
@@ -322,6 +336,8 @@
         function hideMap() {
             mapPanel.classList.remove('active');
             document.body.style.overflow = 'auto';
+            // Quando nascondiamo la mappa, torniamo alla Home e attiviamo il pulsante corretto
+            setActiveScreen('home-screen'); 
         }
         
         function initMap() {
@@ -333,7 +349,7 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(currentMap);
 
-            // Aggiunge i marker usando i dati di data.js
+            // Aggiunge i marker (richiede data.js)
             attrazioni.forEach(section => {
                 section.elementi.forEach(item => {
                     if (item.lat && item.lng) {
@@ -357,6 +373,14 @@
             const listContainer = document.getElementById('attraction-list');
             const descriptionContainer = document.getElementById('current-description');
             
+            // CRITICAL FIX: Controllo se i dati della sezione sono validi per prevenire il crash all'avvio
+            if (!sectionData) {
+                 console.error(`Dati per la sezione '${sectionId}' non trovati. Controlla il tuo data.js.`);
+                 listContainer.innerHTML = `<li><div class="p-4 bg-red-100 rounded-lg text-red-700 font-medium">Impossibile caricare i dettagli dell'itinerario. (Errore nel data.js)</div></li>`;
+                 descriptionContainer.innerHTML = `<strong>Errore Dati:</strong> Sezione non caricata.`;
+                 return; 
+            }
+
             listContainer.innerHTML = '';
             descriptionContainer.innerHTML = `<strong>Itinerario ${sectionData.nome}:</strong> ${sectionData.descrizione}`;
 
@@ -389,6 +413,8 @@
                 listContainer.appendChild(listItem);
             });
         }
+        
+        // --- FUNZIONI DETTAGLIO (Migliorate per robustezza) ---
 
         function showDetail(attractionId, event) {
             if (event) {
@@ -411,11 +437,51 @@
         }
 
         function getAttractionTitle(id) {
+            if (typeof attrazioni === 'undefined') return 'Dettaglio'; 
             const allElements = attrazioni.flatMap(s => s.elementi);
             const item = allElements.find(e => e.id === id);
             return item ? item.titolo : 'Dettaglio';
         }
+        
+        function getAttractionDetail(id) {
+            if (typeof attrazioni === 'undefined') return 'Dati non disponibili.'; 
+            const allElements = attrazioni.flatMap(s => s.elementi);
+            const item = allElements.find(e => e.id === id);
+            
+            if (!item) {
+                return '<p class="text-red-500">Dettaglio attrazione non trovato.</p>';
+            }
 
+            // Simula il contenuto del dettaglio con template
+            return `
+                <div class="space-y-6">
+                    <img src="dettagli/immagini/${item.immagine || 'placeholder.jpg'}" alt="${item.titolo}" class="w-full h-auto object-cover rounded-xl shadow-lg">
+                    
+                    <div class="audio-container">
+                        <p class="font-semibold text-orange-700 flex items-center mb-2">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13.5a2.5 2.5 0 01-2.5 2.5H9z"></path></svg>
+                            Audioguida:
+                        </p>
+                        <audio controls class="w-full">
+                            <source src="dettagli/audio/${item.audio || 'placeholder.mp3'}" type="audio/mp3">
+                            Il tuo browser non supporta l'elemento audio.
+                        </audio>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold mb-2 text-[#054D8F]">Descrizione Completa</h3>
+                        <p class="text-gray-700 leading-relaxed">${item.descrizione_completa || item.dettaglio}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm text-gray-600 border-t border-gray-200 pt-4">
+                        <p>📍 Coordinate: ${item.lat ? `${item.lat}, ${item.lng}` : 'N/D'}</p>
+                        <button onclick="alert('Simulazione Navigazione con Google Maps')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-green-600 transition">
+                            Naviga
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
