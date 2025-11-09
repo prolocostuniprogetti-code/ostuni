@@ -31,7 +31,7 @@
         <div class="bg-white p-6 rounded-lg shadow-2xl max-w-lg w-full">
             <h2 class="text-2xl font-bold text-red-700 mb-4">🚨 ERRORE CRITICO DI CARICAMENTO 🚨</h2>
             <p id="errore-critico-messaggio" class="text-gray-700 font-semibold">
-                I dati essenziali non sono stati trovati. Verifica che il percorso 'dettagli/data.js' sia corretto e che il file non contenga errori di sintassi.
+                I dati essenziali non sono stati trovati. Verifica che il percorso 'dettagli/data.js' sia corretto.
             </p>
             <p class="mt-4 text-sm text-gray-500">
                 (Controlla la console del browser per i dettagli.)
@@ -71,7 +71,6 @@
 
         // Funzione per gestire l'errore critico
         function gestisciErroreCritico(messaggio) {
-            // Nascondi l'interfaccia principale e mostra il messaggio di errore
             const appContainer = document.getElementById('app-container');
             const erroreContainer = document.getElementById('errore-critico-container');
             
@@ -85,39 +84,42 @@
          * CONTROLLO CRITICO: Esegue il controllo subito dopo il caricamento di data.js
          */
         if (typeof attrazioni === 'undefined') {
-            // Se attrazioni non è definito, mostra l'errore e ferma tutto
-            gestisciErroreCritico("File dati non trovato. Assicurati che 'dettagli/data.js' sia caricato correttamente (verifica sintassi e percorso).");
+            gestisciErroreCritico("File dati non trovato. Assicurati che 'dettagli/data.js' sia caricato e senza errori di sintassi.");
         } else {
-            // Funzione principale di inizializzazione, esegue il setup solo se i dati sono presenti
+            // Logica dell'applicazione (solo se i dati sono OK)
+
             function initApp() {
-                // Aggiungiamo un controllo per evitare doppie inizializzazioni in caso di errore
                 if (typeof map !== 'undefined') return;
 
                 // Inizializzazione della mappa Leaflet
-                map = L.map('map').setView([40.7300, 17.5750], 15); // Centro Ostuni
+                map = L.map('map').setView([40.7300, 17.5750], 15);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
 
-                // Aggiunge il FeatureGroup dei marker alla mappa
                 markers.addTo(map);
 
-                // Costruisce la lista dei tour nella sidebar
+                // CHIAMATA CRITICA: Costruisce la lista dei tour
                 renderTourList();
 
-                // Centra la mappa su tutti i dati (necessario un piccolo hack per i markers vuoti all'inizio)
+                // Centra la mappa su tutti i dati
                 const allLatsLngs = attrazioni.flatMap(t => t.elementi).map(e => [e.lat, e.lng]);
                 if (allLatsLngs.length > 0) {
                      map.fitBounds(L.latLngBounds(allLatsLngs), { padding: [50, 50] });
-                } else {
-                     map.setView([40.7300, 17.5750], 15);
                 }
             }
 
             // Funzione per generare l'HTML della lista dei tour
             function renderTourList() {
                 const tourList = document.getElementById('tour-list');
+                
+                if (!tourList) {
+                    // Questo errore apparirebbe in console se l'ID 'tour-list' è sbagliato nell'HTML
+                    console.error("Errore: Elemento 'tour-list' (<ul>) non trovato nel DOM. Verifica l'HTML della sidebar.");
+                    return;
+                }
+
                 tourList.innerHTML = ''; // Pulisce la lista
 
                 attrazioni.forEach(tour => {
@@ -127,7 +129,6 @@
                         <h3 class="font-semibold text-blue-600">${tour.nome}</h3>
                         <p class="text-sm text-gray-500">${tour.descrizione}</p>
                     `;
-                    // Aggiunge l'evento click
                     listItem.addEventListener('click', () => caricaTour(tour.id));
                     tourList.appendChild(listItem);
                 });
@@ -135,24 +136,17 @@
 
             // Funzione per caricare i marker del tour selezionato
             function caricaTour(tourId) {
-                // Rimuove i marker precedenti
                 markers.clearLayers();
-
                 const tour = attrazioni.find(t => t.id === tourId);
                 if (!tour) return;
-
-                // Aggiorna l'ID del tour corrente
                 currentTourId = tourId;
                 
-                // Aggiorna la URL
                 const newUrl = `${window.location.pathname}?tour=${tourId}`;
                 window.history.pushState({ path: newUrl }, '', newUrl);
 
-                // Aggiunge i marker del tour
                 tour.elementi.forEach(elemento => {
                     const marker = L.marker([elemento.lat, elemento.lng]).addTo(markers);
                     
-                    // Contenuto del popup con Tailwind
                     const popupContent = `
                         <div class="font-sans">
                             <h4 class="font-bold text-lg text-gray-800 mb-1">${elemento.numero}. ${elemento.titolo}</h4>
@@ -168,7 +162,6 @@
                     marker.bindPopup(popupContent);
                 });
 
-                // Zoom e centra sulla nuova area
                 if (markers.getLayers().length > 0) {
                     map.fitBounds(markers.getBounds(), { padding: [50, 50] });
                 }
