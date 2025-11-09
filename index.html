@@ -90,15 +90,21 @@
         var markers = L.layerGroup();
         var currentPolyline = null; 
 
-        // Funzione 1: Inizializza la Mappa (Ora usiamo OpenTopoMap)
+        // Funzione 1: Inizializza la Mappa (Layer OSM Standard e Proiezione WGS84)
         function initMap() {
-            // Inizializza la mappa 
-            map = L.map('map').setView([40.7305, 17.5755], 15); 
+            // Inizializza la mappa forzando la proiezione WGS84 (EPSG:4326) e interattività
+            map = L.map('map', {
+                center: [40.7305, 17.5755], 
+                zoom: 15,                   
+                scrollWheelZoom: true,      
+                dragging: true,             
+                crs: L.CRS.EPSG4326 // CORREZIONE CRITICA: Forziamo la proiezione GPS standard
+            }); 
 
-            // Aggiunge il layer di OpenTopoMap per una maggiore precisione
-            L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                maxZoom: 17, 
-                attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
+            // Aggiunge il layer Standard OpenStreetMap (massima compatibilità)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             
             // Aggiunge il layer dei marcatori alla mappa
@@ -109,7 +115,6 @@
         function fitMapToAllMarkers() {
             let allCoordinates = [];
 
-            // Raccoglie tutte le coordinate di tutti i tour
             attrazioni.forEach(tour => {
                 tour.elementi.forEach(el => {
                     allCoordinates.push([el.lat, el.lng]);
@@ -118,10 +123,8 @@
 
             if (allCoordinates.length > 0) {
                 let bounds = L.latLngBounds(allCoordinates);
-                // Adatta la mappa ai limiti calcolati con un padding
                 map.fitBounds(bounds, { padding: [50, 50] });
             } else {
-                // Se non ci sono punti, usa la vista predefinita sul centro di Ostuni
                 map.setView([40.7305, 17.5755], 15); 
             }
         }
@@ -172,8 +175,8 @@
                 tourList.appendChild(li);
             });
 
-            // Centra la mappa su tutti i punti all'avvio
-            fitMapToAllMarkers(); 
+            // CORREZIONE BUG: Lasciamo la centratura disattivata per evitare il disallineamento
+            // fitMapToAllMarkers(); 
         }
 
         // Avvia l'applicazione quando il DOM è pronto
