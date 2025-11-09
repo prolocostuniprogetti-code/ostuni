@@ -15,7 +15,7 @@ const attrazioni = [
                 descrizione_completa: 'Eretta nel Settecento per ringraziare il Santo per aver protetto Ostuni dalla peste, questa colonna alta 20 metri è un capolavoro del barocco locale e un punto d’incontro fondamentale.',
                 immagine: 'sant-oronzo.jpg',
                 audio: 'sant-oronzo.mp3',
-                lat: 40.73010, lng: 17.57635 // COORDINATA CORRETTA
+                lat: 40.73010, lng: 17.57635 // Piazza Libertà
             },
             {
                 id: 'chiesa-spirito-santo',
@@ -25,7 +25,7 @@ const attrazioni = [
                 descrizione_completa: 'Una delle chiese più antiche, con un portale finemente scolpito che preannuncia lo stile elaborato dell\'arte ostunese.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73009, lng: 17.57620 // COORDINATA CORRETTA
+                lat: 40.73009, lng: 17.57620 
             },
             {
                 id: 'palazzo-municipale',
@@ -35,7 +35,7 @@ const attrazioni = [
                 descrizione_completa: 'L\'edificio testimonia la storia civica e religiosa di Ostuni, situato strategicamente sulla piazza principale.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73024, lng: 17.57608 // COORDINATA CORRETTA
+                lat: 40.73024, lng: 17.57608 
             },
             {
                 id: 'chiesa-san-francesco',
@@ -45,7 +45,7 @@ const attrazioni = [
                 descrizione_completa: 'Ricca di arte sacra, la chiesa presenta una facciata sobria ma interni di grande valore storico-artistico.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73024, lng: 17.57599 // COORDINATA CORRETTA
+                lat: 40.73024, lng: 17.57599 
             },
             {
                 id: 'cattedrale',
@@ -55,7 +55,7 @@ const attrazioni = [
                 descrizione_completa: 'Il punto più alto e panoramico della città, un capolavoro di architettura che fonde stili diversi.',
                 immagine: 'cattedrale.jpg',
                 audio: 'cattedrale.mp3',
-                lat: 40.73099, lng: 17.57544 // COORDINATA CORRETTA (CIMA DEL COLLE)
+                lat: 40.73099, lng: 17.57544 // CIMA DEL COLLE
             },
             {
                 id: 'chiesa-stella',
@@ -65,7 +65,7 @@ const attrazioni = [
                 descrizione_completa: 'Situata nella parte sud della città, è nota per la sua storia devozionale e le opere d\'arte conservate al suo interno.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73062, lng: 17.57580 // COORDINATA CORRETTA
+                lat: 40.73062, lng: 17.57580 
             },
             {
                 id: 'chiesa-san-pietro',
@@ -75,7 +75,7 @@ const attrazioni = [
                 descrizione_completa: 'Un altro luogo di culto che segna l\'antico confine del centro abitato.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73059, lng: 17.57680 // COORDINATA CORRETTA
+                lat: 40.73059, lng: 17.57680 
             },
              {
                 id: 'chiesa-carmine',
@@ -85,7 +85,7 @@ const attrazioni = [
                 descrizione_completa: 'Complesso religioso che conclude la visita al nucleo urbano di Ostuni.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73007, lng: 17.57690 // COORDINATA CORRETTA
+                lat: 40.73007, lng: 17.57690 
             }
         ]
     },
@@ -106,7 +106,7 @@ const attrazioni = [
                 descrizione_completa: 'Con la sua imponente facciata, il Palazzo Ayroldi è uno dei palazzi più eleganti lungo il percorso principale.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73062, lng: 17.57565 // COORDINATA CORRETTA
+                lat: 40.73062, lng: 17.57565 
             },
             {
                 id: 'palazzo-siccodà',
@@ -116,7 +116,7 @@ const attrazioni = [
                 descrizione_completa: 'La sua architettura riflette i cambiamenti stilistici avvenuti nel centro storico di Ostuni nei secoli.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73070, lng: 17.57555 // COORDINATA CORRETTA
+                lat: 40.73070, lng: 17.57555 
             },
             {
                 id: 'portale-bizantizzi',
@@ -126,7 +126,7 @@ const attrazioni = [
                 descrizione_completa: 'Questo portale testimonia la ricchezza e l\'eleganza delle famiglie aristocratiche che vivevano vicino alla Cattedrale.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73081, lng: 17.57540 // COORDINATA CORRETTA
+                lat: 40.73081, lng: 17.57540 
             },
             {
                 id: 'portale-ghionda',
@@ -136,7 +136,7 @@ const attrazioni = [
                 descrizione_completa: 'Un altro esempio dell\'arte nobiliare che si concentra sulla cima della città.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73079, lng: 17.57500 // COORDINATA CORRETTA
+                lat: 40.73079, lng: 17.57500 
             },
             {
                 id: 'portale-falghieri',
@@ -146,7 +146,7 @@ const attrazioni = [
                 descrizione_completa: 'Il portale offre un\'immersione nella storia delle grandi famiglie di Ostuni e nelle loro allegorie.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73075, lng: 17.57515 // COORDINATA CORRETTA
+                lat: 40.73075, lng: 17.57515 
             },
             {
                 id: 'portale-musica',
@@ -156,7 +156,7 @@ const attrazioni = [
                 descrizione_completa: 'Probabile sede di un’antica scuola o circolo, si distingue per i suoi dettagli scultorei.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73082, lng: 17.57521 // COORDINATA CORRETTA
+                lat: 40.73082, lng: 17.57521 
             },
             {
                 id: 'portale-palmieri',
@@ -166,7 +166,7 @@ const attrazioni = [
                 descrizione_completa: 'Il portale è un simbolo di lusso nobiliare e conduce a interni storici di grande pregio.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73075, lng: 17.57511 // COORDINATA CORRETTA
+                lat: 40.73075, lng: 17.57511 
             },
             {
                 id: 'portale-jurleo',
@@ -176,7 +176,7 @@ const attrazioni = [
                 descrizione_completa: 'Un altro magnifico esempio di architettura privata nel labirinto di Ostuni.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73061, lng: 17.57508 // COORDINATA CORRETTA
+                lat: 40.73061, lng: 17.57508 
             },
             {
                 id: 'portale-calamo',
@@ -186,7 +186,7 @@ const attrazioni = [
                 descrizione_completa: 'Un palazzo storico che riflette l\'influenza dei grandi centri artistici sulla Puglia.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73045, lng: 17.57520 // COORDINATA CORRETTA
+                lat: 40.73045, lng: 17.57520 
             },
             {
                 id: 'portale-mileti',
@@ -196,7 +196,7 @@ const attrazioni = [
                 descrizione_completa: 'Un punto di interesse che conclude il tour dei palazzi nobiliari della parte occidentale.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73030, lng: 17.57530 // COORDINATA CORRETTA
+                lat: 40.73030, lng: 17.57530 
             }
         ]
     },
@@ -217,7 +217,7 @@ const attrazioni = [
                 descrizione_completa: 'Testimonianza della potente famiglia Zevallos che ha lasciato il segno nel centro storico di Ostuni.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73045, lng: 17.57605 // COORDINATA CORRETTA
+                lat: 40.73045, lng: 17.57605 
             },
             {
                 id: 'capitello-corinzio',
@@ -227,7 +227,7 @@ const attrazioni = [
                 descrizione_completa: 'Un dettaglio che mostra la stratificazione storica degli edifici di Ostuni, con riutilizzi di elementi antichi.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73059, lng: 17.57570 // COORDINATA CORRETTA
+                lat: 40.73059, lng: 17.57570 
             },
             {
                 id: 'convento-monacelle',
@@ -237,7 +237,7 @@ const attrazioni = [
                 descrizione_completa: 'Edificio storico di grande importanza, parte integrante della vita monastica della città nel passato.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73070, lng: 17.57560 // COORDINATA CORRETTA
+                lat: 40.73070, lng: 17.57560 
             },
             {
                 id: 'chiesa-museo',
@@ -247,7 +247,7 @@ const attrazioni = [
                 descrizione_completa: 'Ospita importanti ritrovamenti archeologici come la "Donna di Ostuni", testimoniando l\'antichità del sito.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73078, lng: 17.57550 // COORDINATA CORRETTA
+                lat: 40.73078, lng: 17.57550 
             },
             {
                 id: 'volta-federico',
@@ -257,7 +257,7 @@ const attrazioni = [
                 descrizione_completa: 'Un elemento architettonico che caratterizza la struttura labirintica di Ostuni e ricorda la dominazione sveva.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73085, lng: 17.57565 // COORDINATA CORRETTA
+                lat: 40.73085, lng: 17.57565 
             },
             {
                 id: 'loggia-palazzo',
@@ -267,7 +267,7 @@ const attrazioni = [
                 descrizione_completa: 'Icona di Ostuni, l\'Arco Scoppa incornicia la vista e unisce i due edifici del potere religioso.',
                 immagine: 'arco-scoppa.jpg',
                 audio: 'palazzo-episcopio.mp3',
-                lat: 40.73091, lng: 17.57554 // COORDINATA CORRETTA
+                lat: 40.73091, lng: 17.57554 
             },
             {
                 id: 'largo-pappadà',
@@ -277,7 +277,7 @@ const attrazioni = [
                 descrizione_completa: 'Un punto di sosta essenziale per ammirare il celebre paesaggio ostunese che si estende fino all\'Adriatico.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73080, lng: 17.57500 // COORDINATA CORRETTA
+                lat: 40.73080, lng: 17.57500 
             },
             {
                 id: 'chiesa-compostela',
@@ -287,7 +287,7 @@ const attrazioni = [
                 descrizione_completa: 'Un gioiello nascosto nei vicoli, testimone delle rotte religiose che attraversavano Ostuni.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73065, lng: 17.57488 // COORDINATA CORRETTA
+                lat: 40.73065, lng: 17.57488 
             },
             {
                 id: 'porta-san-demetrio',
@@ -297,7 +297,7 @@ const attrazioni = [
                 descrizione_completa: 'Una delle uscite originali che permetteva l\'accesso alla campagna circostante, essenziale per la difesa della città.',
                 immagine: 'default-c.jpg',
                 audio: 'default-a.mp3',
-                lat: 40.73035, lng: 17.57500 // COORDINATA CORRETTA
+                lat: 40.73035, lng: 17.57500 
             },
             {
                 id: 'porta-nova',
@@ -307,7 +307,7 @@ const attrazioni = [
                 descrizione_completa: "Le mura aragonesi circondavano Ostuni per protezione. Porta Nova è un simbolo dell'architettura difensiva.",
                 immagine: 'mura-aragonesi.jpg',
                 audio: 'mura.mp3',
-                lat: 40.72979, lng: 17.57723 // COORDINATA CORRETTA
+                lat: 40.72979, lng: 17.57723 
             }
         ]
     },
