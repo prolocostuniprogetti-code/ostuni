@@ -14,13 +14,12 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* Stili Tailwind personalizzati per la mappa */
         #map {
             height: 100vh;
             width: 100%;
         }
         .leaflet-popup-content-wrapper {
-            border-radius: 0.5rem; /* rounded-lg */
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -31,10 +30,10 @@
         <div class="bg-white p-6 rounded-lg shadow-2xl max-w-lg w-full">
             <h2 class="text-2xl font-bold text-red-700 mb-4">🚨 ERRORE CRITICO DI CARICAMENTO 🚨</h2>
             <p id="errore-critico-messaggio" class="text-gray-700 font-semibold">
-                I dati essenziali non sono stati trovati. Verifica che il percorso 'dettagli/data.js' sia corretto.
+                I dati essenziali non sono stati trovati. Assicurati che il percorso './dettagli/data.js' e la cartella 'dettagli' siano corretti (tutto minuscolo).
             </p>
             <p class="mt-4 text-sm text-gray-500">
-                (Controlla la console del browser per i dettagli.)
+                (Controlla la Console del browser per i dettagli.)
             </p>
         </div>
     </div>
@@ -61,7 +60,7 @@
         integrity="sha256-20n6a49a/FzYFwFf4c4yJ/fBfE6T1t8K1m1I+E4RjA4="
         crossorigin=""></script>
 
-    <script src="dettagli/data.js"></script> 
+    <script src="./dettagli/data.js"></script> 
 
     <script>
         // Variabili globali
@@ -69,7 +68,6 @@
         let markers = L.featureGroup();
         let currentTourId = null;
 
-        // Funzione per gestire l'errore critico
         function gestisciErroreCritico(messaggio) {
             const appContainer = document.getElementById('app-container');
             const erroreContainer = document.getElementById('errore-critico-container');
@@ -80,18 +78,12 @@
             console.error("ERRORE CRITICO: ", messaggio);
         }
 
-        /**
-         * CONTROLLO CRITICO: Esegue il controllo subito dopo il caricamento di data.js
-         */
         if (typeof attrazioni === 'undefined') {
-            gestisciErroreCritico("File dati non trovato. Assicurati che 'dettagli/data.js' sia caricato e senza errori di sintassi.");
+            gestisciErroreCritico("File dati non trovato. Assicurati che il file 'data.js' sia nella cartella 'dettagli' (tutto minuscolo).");
         } else {
-            // Logica dell'applicazione (solo se i dati sono OK)
-
             function initApp() {
                 if (typeof map !== 'undefined') return;
 
-                // Inizializzazione della mappa Leaflet
                 map = L.map('map').setView([40.7300, 17.5750], 15);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -99,29 +91,22 @@
                 }).addTo(map);
 
                 markers.addTo(map);
-
-                // CHIAMATA CRITICA: Costruisce la lista dei tour
                 renderTourList();
 
-                // Centra la mappa su tutti i dati
                 const allLatsLngs = attrazioni.flatMap(t => t.elementi).map(e => [e.lat, e.lng]);
                 if (allLatsLngs.length > 0) {
                      map.fitBounds(L.latLngBounds(allLatsLngs), { padding: [50, 50] });
                 }
             }
 
-            // Funzione per generare l'HTML della lista dei tour
             function renderTourList() {
                 const tourList = document.getElementById('tour-list');
-                
                 if (!tourList) {
-                    // Questo errore apparirebbe in console se l'ID 'tour-list' è sbagliato nell'HTML
-                    console.error("Errore: Elemento 'tour-list' (<ul>) non trovato nel DOM. Verifica l'HTML della sidebar.");
+                    console.error("Errore: Elemento 'tour-list' non trovato nel DOM.");
                     return;
                 }
 
-                tourList.innerHTML = ''; // Pulisce la lista
-
+                tourList.innerHTML = '';
                 attrazioni.forEach(tour => {
                     const listItem = document.createElement('li');
                     listItem.className = 'p-3 border-b hover:bg-gray-100 cursor-pointer rounded-lg transition duration-150';
@@ -134,7 +119,6 @@
                 });
             }
 
-            // Funzione per caricare i marker del tour selezionato
             function caricaTour(tourId) {
                 markers.clearLayers();
                 const tour = attrazioni.find(t => t.id === tourId);
@@ -151,7 +135,7 @@
                         <div class="font-sans">
                             <h4 class="font-bold text-lg text-gray-800 mb-1">${elemento.numero}. ${elemento.titolo}</h4>
                             <p class="text-sm text-gray-600 mb-2">${elemento.dettaglio}</p>
-                            <img src="dettagli/immagini/${elemento.immagine}" alt="${elemento.titolo}" class="w-full h-32 object-cover rounded-md mb-2">
+                            <img src="./dettagli/immagini/${elemento.immagine}" alt="${elemento.titolo}" class="w-full h-32 object-cover rounded-md mb-2">
                             <p class="text-xs text-gray-500">${elemento.descrizione_completa}</p>
                             <button onclick="playAudio('${elemento.audio}')" 
                                     class="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-sm transition duration-150">
@@ -167,14 +151,13 @@
                 }
             }
 
-            // Funzione per la riproduzione audio
             window.playAudio = function(audioFile) {
-                const audio = new Audio(`dettagli/audio/${audioFile}`);
+                // PERCORSO AUDIO CORRETTO
+                const audio = new Audio(`./dettagli/audio/${audioFile}`);
                 audio.play().catch(e => console.error("Errore nella riproduzione audio:", e));
             }
         }
         
-        // Attivazione: Esegue initApp solo dopo che l'intera struttura del DOM è caricata.
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
