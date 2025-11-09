@@ -3,451 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tour Guide App - Ostuni</title>
+    <title>Ostuni Guida Turistica Interattiva</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/SVRKdeZ1V+4A4K7T1w="
         crossorigin=""/>
+
     <link rel="stylesheet" href="style.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-blue': '#054D8F',
-                        'secondary-orange': '#FF8C00',
-                    }
-                }
-            }
+
+    <style>
+        /* Stili Tailwind personalizzati per la mappa */
+        #map {
+            height: 100vh;
+            width: 100%;
         }
-    </script>
+        .leaflet-popup-content-wrapper {
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+    </style>
 </head>
-<body class="bg-gray-50 antialiased"> <header id="app-header" class="fixed top-0 left-0 w-full bg-white shadow-lg z-20">
-        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
-            <h1 id="header-title" class="text-xl font-bold text-primary-blue">Tour Guide App</h1>
-            <div class="flex space-x-3">
-                <button class="text-gray-600 hover:text-primary-blue transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v2a3 3 0 11-6 0v-2m6 0H9"></path></svg>
-                </button>
-            </div>
-        </div>
-    </header>
 
-    <div id="main-content" class="pt-[56px] pb-[72px] max-w-4xl mx-auto min-h-screen">
+<body class="bg-gray-50 antialiased">
+    
+    <div id="errore-critico-container" class="fixed inset-0 bg-red-800 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-2xl max-w-lg w-full">
+            <h2 class="text-2xl font-bold text-red-700 mb-4">🚨 ERRORE CRITICO DI CARICAMENTO 🚨</h2>
+            <p id="errore-critico-messaggio" class="text-gray-700 font-semibold">
+                I dati essenziali non sono stati trovati. Verifica che il file 'dettagli/data.js' esista e sia caricato nell'ordine corretto.
+            </p>
+            <p class="mt-4 text-sm text-gray-500">
+                (Controlla la console del browser per i dettagli sulla causa del fallimento 404 Not Found).
+            </p>
+        </div>
+    </div>
+
+    <div id="app-container" class="flex h-screen overflow-hidden">
         
-        <div id="home-screen" class="app-screen p-4 space-y-6 active">
-            
-            <div id="welcome-card" class="bg-white p-5 rounded-xl shadow-md border-t-4 border-primary-blue">
+        <div id="sidebar" class="w-full md:w-1/3 lg:w-1/4 bg-white shadow-xl flex flex-col transition-transform duration-300 ease-in-out">
+            <div class="p-4 border-b">
+                <h1 class="text-xl font-bold text-gray-800">Ostuni: Tour Interattivo</h1>
+                <p class="text-sm text-gray-500">Seleziona un tour dalla lista.</p>
             </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-md">
-                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Itinerari Popolari a Ostuni</h2>
-                
-                <div class="flex space-x-2 overflow-x-auto pb-2 mb-4 whitespace-nowrap scroll-container">
-                    <button id="tab-barocco" onclick="changeSection('barocco')" class="tab-button active">Barocco</button>
-                    <button id="tab-medioevale" onclick="changeSection('medioevale')" class="tab-button">Medioevale</button>
-                    <button id="tab-costiero" onclick="changeSection('costiero')" class="tab-button">Costiero</button>
-                </div>
-
-                <p id="current-description" class="text-sm text-gray-600 mb-4 italic"></p>
-                
-                <ul id="attraction-list" class="space-y-3">
+            
+            <ul id="tour-list" class="p-4 space-y-2 overflow-y-auto flex-grow">
                 </ul>
-            </div>
-            
-            <div class="bg-white p-5 rounded-xl shadow-md">
-                <h2 class="text-lg font-bold text-gray-800 mb-3">Vedi Attrazioni sulla Mappa</h2>
-                <div class="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
-                    <img src="dettagli/immagini/ostuni_placeholder_map.jpg" alt="Mappa Ostuni" class="w-full h-full object-cover opacity-70">
-                    <button onclick="showMap()" class="absolute bg-primary-blue text-white font-semibold py-2 px-4 rounded-full shadow-lg hover:bg-[#03376B] transition duration-150">
-                        Apri Mappa Interattiva
-                    </button>
-                </div>
-            </div>
-
-        </div> 
-        <div id="bookings-screen" class="app-screen p-4 space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Le Tue Prenotazioni</h2>
-            <div class="bg-white p-6 rounded-xl shadow-md text-center">
-                <svg class="w-12 h-12 mx-auto text-primary-blue mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 4V3M3 10h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <p class="text-gray-600">Nessuna prenotazione attiva al momento.</p>
-                <button class="mt-4 bg-secondary-orange text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-600 transition">
-                    Cerca un'attività
-                </button>
-            </div>
         </div>
 
-        <div id="profile-screen" class="app-screen p-4 space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800">Il Mio Profilo</h2>
-            <div class="bg-white p-6 rounded-xl shadow-md space-y-4">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-xl font-bold text-gray-600">
-                        U
-                    </div>
-                    <div>
-                        <p class="text-lg font-bold text-gray-800" id="profile-username">Ospite (Non Registrato)</p>
-                        <p class="text-sm text-gray-500">Membro dal: N/D</p>
-                    </div>
-                </div>
-                <button class="w-full bg-gray-100 text-primary-blue py-2 rounded-lg font-medium hover:bg-gray-200 transition">
-                    Modifica Account
-                </button>
-                <button onclick="localStorage.removeItem('userName'); renderWelcomeCard(); setActiveScreen('home-screen');" class="w-full bg-red-100 text-red-600 py-2 rounded-lg font-medium hover:bg-red-200 transition">
-                    Logout (Simulato)
-                </button>
-            </div>
+        <div id="main-content" class="w-full md:w-2/3 lg:w-3/4">
+            <div id="map"></div>
         </div>
 
-    </div> 
-    <div id="map-panel" class="app-overlay">
-        <div class="fixed top-0 left-0 w-full bg-white shadow-lg z-30">
-            <div class="max-w-4xl mx-auto p-4 flex justify-start items-center">
-                <button onclick="hideMap()" class="text-gray-600 hover:text-red-500 transition mr-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-                <h2 class="text-xl font-bold text-primary-blue">Mappa Interattiva</h2>
-            </div>
-        </div>
-        <div id="map"></div>
     </div>
-
-    <div id="detail-panel" class="app-overlay">
-        <div class="fixed top-0 left-0 w-full bg-white shadow-lg z-30">
-            <div class="max-w-4xl mx-auto p-4 flex justify-start items-center">
-                <button onclick="hideDetail()" class="text-gray-600 hover:text-primary-blue transition mr-4">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                </button>
-                <h2 class="text-xl font-bold text-primary-blue truncate" id="detail-title-header">Dettaglio Attrazione</h2>
-            </div>
-        </div>
-        <div id="detail-content" class="pt-[56px] p-4 max-w-4xl mx-auto">
-            </div>
-    </div>
-
-
-    <nav id="app-navbar" class="fixed bottom-0 left-0 w-full bg-white shadow-2xl z-20 border-t border-gray-200">
-        <div class="max-w-4xl mx-auto">
-            <div class="flex justify-around">
-                <button id="nav-home" class="nav-button w-1/4 active" onclick="setActiveScreen('home-screen')">
-                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7m-7-7h14m-7 0v10"></path></svg>
-                    <span>Home</span>
-                </button>
-                <button id="nav-map" class="nav-button w-1/4" onclick="showMap()">
-                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span>Mappa</span>
-                </button>
-                <button id="nav-bookings" class="nav-button w-1/4" onclick="setActiveScreen('bookings-screen')">
-                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-4 4V3M3 10h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>Prenotazioni</span>
-                </button>
-                <button id="nav-profile" class="nav-button w-1/4" onclick="setActiveScreen('profile-screen')">
-                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    <span>Profilo</span>
-                </button>
-            </div>
-        </div>
-    </nav>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20n6a9c8z8+p4u7s+j8x2e1uA4gH4m9bA4Xv8gD8v4g="
+        integrity="sha256-20n6a49a/FzYFwFf4c4yJ/fBfE6T1t8K1m1I+E4RjA4="
         crossorigin=""></script>
-        
-    <script src="dettagli/data.js"></script>
-    
+
+    <script src="dettagli/data.js"></script> 
+
     <script>
-        const detailPanel = document.getElementById('detail-panel');
-        const detailContent = document.getElementById('detail-content');
-        const detailTitleHeader = document.getElementById('detail-title-header');
-        const welcomeCard = document.getElementById('welcome-card');
-        const mapPanel = document.getElementById('map-panel'); 
-        const headerTitle = document.getElementById('header-title');
-        let userName = localStorage.getItem('userName'); 
-        let currentMap = null; 
-        
-        // Funzione di inizializzazione principale
-        function initApp() {
-            // CRITICAL CHECK: Verifica che data.js sia caricato correttamente
-            if (typeof attrazioni === 'undefined') {
-                console.error("ERRORE: Variabile 'attrazioni' non trovata. Controlla il nome del file 'dettagli/data.js'.");
-                document.getElementById('main-content').innerHTML = `
-                    <div class="p-6 bg-red-100 border-l-4 border-red-500 text-red-700 font-bold rounded-lg">
-                        ERRORE CRITICO: File dati non trovato. Assicurati che il file nella cartella 'dettagli/' si chiami ESATTAMENTE 'data.js'.
-                    </div>
-                `;
-                return;
-            }
+        // Variabili globali
+        let map;
+        let markers = L.featureGroup();
+        let currentTourId = null;
 
-            // Imposta lo stato iniziale
-            renderWelcomeCard();
-            setActiveScreen('home-screen'); 
+        // Funzione per gestire l'errore critico
+        function gestisciErroreCritico(messaggio) {
+            // Nascondi l'interfaccia principale e mostra il messaggio di errore
+            const appContainer = document.getElementById('app-container');
+            const erroreContainer = document.getElementById('errore-critico-container');
             
-            // Inizializza la sezione itinerari (se 'barocco' esiste in data.js)
-            changeSection('barocco');
+            if (appContainer) appContainer.classList.add('hidden');
+            if (erroreContainer) erroreContainer.classList.remove('hidden');
+            document.getElementById('errore-critico-messaggio').textContent = messaggio;
+            console.error("ERRORE CRITICO: ", messaggio);
         }
 
-        // --- GESTIONE SCHERMATE ---
-        function setActiveScreen(screenId) {
-            // Nasconde l'overlay della Mappa se attivo
-            mapPanel.classList.remove('active');
-            document.body.style.overflow = 'auto'; 
-        
-            document.querySelectorAll('.app-screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
+        /**
+         * CRITICAL CHECK: Verifica che data.js sia caricato correttamente
+         * Questo controllo ora avviene DOPO il tag <script src="dettagli/data.js"></script>
+         */
+        if (typeof attrazioni === 'undefined') {
+            // Se attrazioni non è definito, chiama immediatamente l'handler di errore
+            gestisciErroreCritico("File dati non trovato. Assicurati che il percorso 'dettagli/data.js' sia corretto (anche le maiuscole/minuscole).");
+        } else {
+            // Funzione principale di inizializzazione, esegue il setup solo se i dati sono presenti
+            function initApp() {
+                if (typeof attrazioni === 'undefined') {
+                    // Prevenzione: non dovrebbe più accadere qui
+                    return; 
+                }
 
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            document.getElementById(`nav-${screenId.split('-')[0]}`).classList.add('active');
-            
-            // Aggiorna il titolo nell'header
-            const titles = {
-                'home-screen': 'Home Dashboard',
-                'bookings-screen': 'Le Tue Prenotazioni',
-                'profile-screen': 'Gestisci Profilo'
-            };
-            headerTitle.textContent = titles[screenId] || 'Tour Guide App';
-            
-            if (screenId === 'profile-screen') {
-                document.getElementById('profile-username').textContent = userName || 'Ospite (Non Registrato)';
-            }
-            
-            window.scrollTo(0, 0);
-        }
-        
-        // --- LOGICA DI LOGIN/REGISTRAZIONE ---
-        function renderWelcomeCard() {
-            userName = localStorage.getItem('userName');
-            if (userName) {
-                welcomeCard.innerHTML = `
-                    <p class="text-lg font-semibold text-gray-800 mb-1">Benvenuto, ${userName}! 👋</p>
-                    <p class="text-sm text-gray-500">Esplora gli itinerari o prenota una guida locale.</p>
-                `;
-            } else {
-                welcomeCard.innerHTML = `
-                    <p class="text-base font-semibold text-gray-800 mb-3">Registrati/Accedi per un'esperienza completa!</p>
-                    <div class="flex space-x-2">
-                        <input id="userNameInput" type="text" placeholder="Inserisci Email (Simulato)" class="flex-grow p-2 border border-gray-300 rounded-lg text-sm focus:ring-primary-blue focus:border-primary-blue">
-                        <button onclick="registerUser()" class="bg-primary-blue text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#03376B] transition duration-150 flex-shrink-0">
-                            Accedi/Registrati
-                        </button>
-                    </div>
-                `;
-            }
-        }
+                // Inizializzazione della mappa Leaflet
+                map = L.map('map').setView([40.7300, 17.5750], 15); // Centro Ostuni
 
-        function registerUser() {
-            const inputElement = document.getElementById('userNameInput');
-            const email = inputElement.value.trim();
-            const name = email.split('@')[0];
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
 
-            if (email && email.includes('@')) {
-                localStorage.setItem('userName', name);
-                userName = name;
-                renderWelcomeCard(); 
-            } else {
-                alert('Inserisci una email valida per la simulazione di accesso!');
-            }
-        }
-        
-        // --- FUNZIONI MAPPA (CORRETTE e Potenziate) ---
+                // Aggiunge il FeatureGroup dei marker alla mappa
+                markers.addTo(map);
 
-        function showMap() {
-            // Nasconde tutte le schermate attive e deseleziona i pulsanti Nav
-            document.querySelectorAll('.app-screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            // Attiva il pulsante Mappa
-            document.getElementById('nav-map').classList.add('active');
-            
-            // Rende il pannello Mappa visibile
-            mapPanel.classList.add('active');
-            document.body.style.overflow = 'hidden';
+                // Costruisce la lista dei tour nella sidebar
+                renderTourList();
 
-            // Inizializza la mappa se non è ancora stata creata
-            if (!currentMap) {
-                initMap();
-            } 
-            
-            // FIX CRITICO: Forza il ricalcolo delle dimensioni.
-            if (currentMap) {
-                setTimeout(() => {
-                    // Questa chiamata risolve l'overlay bianco.
-                    currentMap.invalidateSize();
-                }, 10); 
-            }
-        }
-        
-        function hideMap() {
-            mapPanel.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            // Quando nascondiamo la mappa, torniamo alla Home e attiviamo il pulsante corretto
-            setActiveScreen('home-screen'); 
-        }
-        
-        function initMap() {
-            // L'errore 'L is not defined' si verifica se Leaflet non è caricato.
-            // Dato che Leaflet è inserito sopra, non dovrebbe succedere.
-            if (typeof L === 'undefined') {
-                 console.error("ERRORE CRITICO: La libreria Leaflet non è stata caricata.");
-                 return;
+                // Se esiste un ID di tour nella query URL, caricalo
+                const urlParams = new URLSearchParams(window.location.search);
+                const initialTourId = urlParams.get('tour');
+                if (initialTourId) {
+                    caricaTour(initialTourId);
+                } else {
+                    // Centra la mappa su tutti i dati (opzionale: zoom out)
+                    map.fitBounds(markers.getBounds(), { padding: [50, 50] });
+                }
             }
 
-            const ostuniCoords = [40.7303, 17.5752];
+            // Funzione per generare l'HTML della lista dei tour
+            function renderTourList() {
+                const tourList = document.getElementById('tour-list');
+                tourList.innerHTML = ''; // Pulisce la lista
 
-            currentMap = L.map('map').setView(ostuniCoords, 15);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(currentMap);
-
-            // Aggiunge i marker (richiede data.js)
-            if (typeof attrazioni !== 'undefined') {
-                attrazioni.forEach(section => {
-                    section.elementi.forEach(item => {
-                        if (item.lat && item.lng) {
-                            L.marker([item.lat, item.lng])
-                                .addTo(currentMap)
-                                .bindPopup(`
-                                    <b>${item.titolo}</b><br>${item.dettaglio}
-                                    <br><button onclick="showDetail('${item.id}', { preventDefault: () => {} }); hideMap();" 
-                                        class="bg-primary-blue text-white text-xs px-2 py-1 rounded mt-2 hover:bg-[#03376B] transition">
-                                        Vedi Dettaglio
-                                    </button>
-                                `);
-                        }
-                    });
+                attrazioni.forEach(tour => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'p-3 border-b hover:bg-gray-100 cursor-pointer rounded-lg transition duration-150';
+                    listItem.innerHTML = `
+                        <h3 class="font-semibold text-blue-600">${tour.nome}</h3>
+                        <p class="text-sm text-gray-500">${tour.descrizione}</p>
+                    `;
+                    // Aggiunge l'evento click
+                    listItem.addEventListener('click', () => caricaTour(tour.id));
+                    tourList.appendChild(listItem);
                 });
             }
-        }
-        
-        // --- FUNZIONI CONTENUTO (Itinerari) ---
-        function changeSection(sectionId) {
-            // CRITICAL FIX: Controllo se la variabile attrazioni esiste
-            if (typeof attrazioni === 'undefined') return;
 
-            const sectionData = attrazioni.find(s => s.id === sectionId);
-            const listContainer = document.getElementById('attraction-list');
-            const descriptionContainer = document.getElementById('current-description');
-            
-            // CRITICAL FIX: Controllo se i dati della sezione sono validi per prevenire il crash all'avvio
-            if (!sectionData) {
-                 console.error(`Dati per la sezione '${sectionId}' non trovati. Controlla il tuo data.js.`);
-                 listContainer.innerHTML = `<li><div class="p-4 bg-red-100 rounded-lg text-red-700 font-medium">Impossibile caricare i dettagli dell'itinerario. (Errore nel data.js)</div></li>`;
-                 descriptionContainer.innerHTML = `<strong>Errore Dati:</strong> Sezione non caricata.`;
-                 return; 
-            }
+            // Funzione per caricare i marker del tour selezionato
+            function caricaTour(tourId) {
+                // Rimuove i marker precedenti
+                markers.clearLayers();
 
-            listContainer.innerHTML = '';
-            descriptionContainer.innerHTML = `<strong>Itinerario ${sectionData.nome}:</strong> ${sectionData.descrizione}`;
+                const tour = attrazioni.find(t => t.id === tourId);
+                if (!tour) return;
 
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            document.getElementById(`tab-${sectionId}`).classList.add('active');
-
-            sectionData.elementi.forEach(item => {
-                const listItem = document.createElement('li');
+                // Aggiorna l'ID del tour corrente
+                currentTourId = tourId;
                 
-                listItem.innerHTML = `
-                    <div class="attraction-card">
-                        <a href="#" onclick="showDetail('${item.id}', event)" class="flex justify-between items-center w-full">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-8 h-8 flex items-center justify-center bg-primary-blue text-white font-bold rounded-full flex-shrink-0">
-                                    ${item.numero}
-                                </div>
-                                <div>
-                                    <p class="text-base font-semibold text-gray-800 hover:text-primary-blue transition duration-150">
-                                        ${item.titolo}
-                                    </p>
-                                    <p class="text-xs text-gray-500 mt-0.5">${item.dettaglio}</p>
-                                </div>
-                            </div>
-                            <svg class="w-5 h-5 text-primary-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </a>
-                    </div>
-                `;
-                listContainer.appendChild(listItem);
-            });
-        }
-        
-        // --- FUNZIONI DETTAGLIO (Migliorate per robustezza) ---
+                // Aggiorna la URL
+                const newUrl = `${window.location.pathname}?tour=${tourId}`;
+                window.history.pushState({ path: newUrl }, '', newUrl);
 
-        function showDetail(attractionId, event) {
-            if (event && event.preventDefault) {
-                event.preventDefault(); 
-            }
-            
-            const detailHTML = getAttractionDetail(attractionId);
-            
-            detailContent.innerHTML = detailHTML;
-            detailTitleHeader.textContent = getAttractionTitle(attractionId);
-            detailPanel.classList.add('active');
-
-            document.body.style.overflow = 'hidden'; 
-            detailPanel.scrollTop = 0; 
-        }
-
-        function hideDetail() {
-            detailPanel.classList.remove('active');
-            document.body.style.overflow = 'auto'; 
-        }
-
-        function getAttractionTitle(id) {
-            if (typeof attrazioni === 'undefined') return 'Dettaglio'; 
-            const allElements = attrazioni.flatMap(s => s.elementi);
-            const item = allElements.find(e => e.id === id);
-            return item ? item.titolo : 'Dettaglio';
-        }
-        
-        function getAttractionDetail(id) {
-            if (typeof attrazioni === 'undefined') return 'Dati non disponibili.'; 
-            const allElements = attrazioni.flatMap(s => s.elementi);
-            const item = allElements.find(e => e.id === id);
-            
-            if (!item) {
-                return '<p class="text-red-500">Dettaglio attrazione non trovato.</p>';
-            }
-
-            // Simula il contenuto del dettaglio con template
-            return `
-                <div class="space-y-6">
-                    <img src="dettagli/immagini/${item.immagine || 'placeholder.jpg'}" alt="${item.titolo}" class="w-full h-auto object-cover rounded-xl shadow-lg">
+                // Aggiunge i marker del tour
+                tour.elementi.forEach(elemento => {
+                    const marker = L.marker([elemento.lat, elemento.lng]).addTo(markers);
                     
-                    <div class="audio-container">
-                        <p class="font-semibold text-secondary-orange flex items-center mb-2">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13.5a2.5 2.5 0 01-2.5 2.5H9z"></path></svg>
-                            Audioguida:
-                        </p>
-                        <audio controls class="w-full">
-                            <source src="dettagli/audio/${item.audio || 'placeholder.mp3'}" type="audio/mp3">
-                            Il tuo browser non supporta l'elemento audio.
-                        </audio>
-                    </div>
+                    // Contenuto del popup con Tailwind
+                    const popupContent = `
+                        <div class="font-sans">
+                            <h4 class="font-bold text-lg text-gray-800 mb-1">${elemento.numero}. ${elemento.titolo}</h4>
+                            <p class="text-sm text-gray-600 mb-2">${elemento.dettaglio}</p>
+                            <img src="dettagli/immagini/${elemento.immagine}" alt="${elemento.titolo}" class="w-full h-32 object-cover rounded-md mb-2">
+                            <p class="text-xs text-gray-500">${elemento.descrizione_completa}</p>
+                            <button onclick="playAudio('${elemento.audio}')" 
+                                    class="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-sm transition duration-150">
+                                Ascolta Audio
+                            </button>
+                        </div>
+                    `;
+                    marker.bindPopup(popupContent);
+                });
 
-                    <div>
-                        <h3 class="text-xl font-bold mb-2 text-primary-blue">Descrizione Completa</h3>
-                        <p class="text-gray-700 leading-relaxed">${item.descrizione_completa || item.dettaglio}</p>
-                    </div>
+                // Zoom e centra sulla nuova area
+                if (markers.getLayers().length > 0) {
+                    map.fitBounds(markers.getBounds(), { padding: [50, 50] });
+                }
+            }
 
-                    <div class="flex justify-between items-center text-sm text-gray-600 border-t border-gray-200 pt-4">
-                        <p>📍 Coordinate: ${item.lat ? `${item.lat}, ${item.lng}` : 'N/D'}</p>
-                        <button onclick="alert('Simulazione Navigazione con Google Maps')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-green-600 transition">
-                            Naviga
-                        </button>
-                    </div>
-                </div>
-            `;
+            // Funzione per la riproduzione audio (richiede un player audio nell'HTML)
+            window.playAudio = function(audioFile) {
+                const audio = new Audio(`dettagli/audio/${audioFile}`);
+                audio.play().catch(e => console.error("Errore nella riproduzione audio:", e));
+            }
         }
-
-        // Avvia l'applicazione dopo il caricamento della pagina (Listener corretto)
+        
+        // Attivazione: Esegue initApp solo dopo che l'intera struttura del DOM è caricata.
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
