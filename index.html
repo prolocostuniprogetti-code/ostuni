@@ -82,8 +82,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> 
     
-    <script src="https://unpkg.com/leaflet.gridlayer.googlemnn/leaflet-google.js"></script>
-    
     <script src="./dettagli/data.js"></script>
 
     <script>
@@ -92,14 +90,15 @@
         var markers = L.layerGroup();
         var currentPolyline = null; 
 
-        // Funzione 1: Inizializza la Mappa (Ora usa Google Satellite)
+        // Funzione 1: Inizializza la Mappa (Ora usiamo la stabile OpenStreetMap)
         function initMap() {
             // Inizializza la mappa 
             map = L.map('map').setView([40.7305, 17.5755], 15); 
 
-            // NUOVO: Aggiunge il layer di Google Maps (Satellitare)
-            L.gridLayer.google({
-                type: 'satellite' // Usa 'satellite', 'roadmap', 'hybrid', o 'terrain'
+            // Aggiunge il layer di OpenStreetMap (stabile e funzionale)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
             
             // Aggiunge il layer dei marcatori alla mappa
@@ -119,8 +118,10 @@
 
             if (allCoordinates.length > 0) {
                 let bounds = L.latLngBounds(allCoordinates);
+                // Adatta la mappa ai limiti calcolati con un padding
                 map.fitBounds(bounds, { padding: [50, 50] });
             } else {
+                // Se non ci sono punti, usa la vista predefinita sul centro di Ostuni
                 map.setView([40.7305, 17.5755], 15); 
             }
         }
