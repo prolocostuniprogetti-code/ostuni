@@ -19,7 +19,8 @@ const attrazioni = [
                 id: 'palazzo-episcopio',
                 numero: 2,
                 titolo: 'Arco Scoppa e Palazzo Episcopio',
-               dettaglio: "L'elegante ponte che collega il Palazzo Vescovile e il Seminario.",
+                // CORREZIONE DEL PROBLEMA DI SINTASSI QUI (uso dei doppi apici)
+                dettaglio: "L'elegante ponte che collega il Palazzo Vescovile e il Seminario.",
                 descrizione_completa: "L'Arco Scoppa, icona di Ostuni, è un passaggio aereo che incornicia la vista sulla città e unisce due importanti edifici barocchi: il Palazzo del Vescovo e il Palazzo del Seminario. Perfetto per foto panoramiche.",
                 immagine: 'arco-scoppa.jpg',
                 audio: 'palazzo-episcopio.mp3',
@@ -98,5 +99,3 @@ const attrazioni = [
         ]
     }
 ];
-
-
