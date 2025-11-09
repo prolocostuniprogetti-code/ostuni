@@ -90,10 +90,230 @@ const attrazioni = [
         ]
     },
     
-    // ... [OMESSO IL TOUR 2 e 3 per brevità, ma usa la versione completa che ti ho fornito] ...
+    // ====================================================================
+    // 2. TOUR: OSTUNI SEGRETA E I PALAZZI 
+    // ====================================================================
+    {
+        id: 'palazzi-segreti',
+        nome: '2. Ostuni Segreta e i Palazzi',
+        descrizione: "Un itinerario dedicato ai dettagli architettonici, i portali e le storie nascoste delle famiglie nobiliari.",
+        elementi: [
+            {
+                id: 'palazzo-ayroldi',
+                numero: 1,
+                titolo: 'Palazzo Ayroldi',
+                dettaglio: 'Esempio di residenza nobiliare settecentesca.',
+                descrizione_completa: 'Con la sua imponente facciata, il Palazzo Ayroldi è uno dei palazzi più eleganti lungo il percorso principale.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73062, lng: 17.57565 // COORDINATA CORRETTA
+            },
+            {
+                id: 'palazzo-siccodà',
+                numero: 2,
+                titolo: 'Palazzo Siccodà',
+                dettaglio: 'Importante palazzo con influenze rinascimentali.',
+                descrizione_completa: 'La sua architettura riflette i cambiamenti stilistici avvenuti nel centro storico di Ostuni nei secoli.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73070, lng: 17.57555 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-bizantizzi',
+                numero: 3,
+                titolo: 'Portale palazzo Bizantizzi',
+                dettaglio: 'Uno dei più bei portali nobiliari del centro storico.',
+                descrizione_completa: 'Questo portale testimonia la ricchezza e l\'eleganza delle famiglie aristocratiche che vivevano vicino alla Cattedrale.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73081, lng: 17.57540 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-ghionda',
+                numero: 4,
+                titolo: 'Portale palazzo Ghionda',
+                dettaglio: 'Portale rinascimentale con raffinati elementi decorativi.',
+                descrizione_completa: 'Un altro esempio dell\'arte nobiliare che si concentra sulla cima della città.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73079, lng: 17.57500 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-falghieri',
+                numero: 5,
+                titolo: 'Portale palazzo Falghieri',
+                dettaglio: 'Caratteristico per i suoi simboli araldici scolpiti.',
+                descrizione_completa: 'Il portale offre un\'immersione nella storia delle grandi famiglie di Ostuni e nelle loro allegorie.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73075, lng: 17.57515 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-musica',
+                numero: 6,
+                titolo: 'Portale palazzo della Musica',
+                dettaglio: 'Suggestivo portale che si apre su un antico cortile.',
+                descrizione_completa: 'Probabile sede di un’antica scuola o circolo, si distingue per i suoi dettagli scultorei.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73082, lng: 17.57521 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-palmieri',
+                numero: 7,
+                titolo: 'Portale palazzo Palmieri',
+                dettaglio: 'Uno dei palazzi più ricchi e meglio conservati.',
+                descrizione_completa: 'Il portale è un simbolo di lusso nobiliare e conduce a interni storici di grande pregio.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73075, lng: 17.57511 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-jurleo',
+                numero: 8,
+                titolo: 'Portale palazzo Jurleo',
+                dettaglio: 'Portale caratterizzato da elementi tardo-gotici.',
+                descrizione_completa: 'Un altro magnifico esempio di architettura privata nel labirinto di Ostuni.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73061, lng: 17.57508 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-calamo',
+                numero: 9,
+                titolo: 'Portale palazzo Calamo',
+                dettaglio: 'Distinto per la sua eleganza e sobrietà rinascimentale.',
+                descrizione_completa: 'Un palazzo storico che riflette l\'influenza dei grandi centri artistici sulla Puglia.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73045, lng: 17.57520 // COORDINATA CORRETTA
+            },
+            {
+                id: 'portale-mileti',
+                numero: 10,
+                titolo: 'Portale palazzo Mileti',
+                dettaglio: 'Noto per le sue sculture e l\'uso della pietra locale.',
+                descrizione_completa: 'Un punto di interesse che conclude il tour dei palazzi nobiliari della parte occidentale.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73030, lng: 17.57530 // COORDINATA CORRETTA
+            }
+        ]
+    },
     
     // ====================================================================
-    // 4. TOUR: ESTENSIONE COSTIERA 
+    // 3. TOUR: OSTUNI INSOLITA E PANORAMICA 
+    // ====================================================================
+    {
+        id: 'insolita-panoramica',
+        nome: '3. Ostuni Insolita e Panoramica',
+        descrizione: "Scopri angoli suggestivi, dettagli artistici/culturali, le antiche porte e i punti panoramici.",
+        elementi: [
+            {
+                id: 'stemma-zevallos',
+                numero: 1,
+                titolo: 'Stemma degli Zevallos',
+                dettaglio: 'Uno stemma nobiliare che decora l\'angolo di un antico palazzo.',
+                descrizione_completa: 'Testimonianza della potente famiglia Zevallos che ha lasciato il segno nel centro storico di Ostuni.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73045, lng: 17.57605 // COORDINATA CORRETTA
+            },
+            {
+                id: 'capitello-corinzio',
+                numero: 2,
+                titolo: 'Capitello Corinzio (Palazzo)',
+                dettaglio: 'Elemento architettonico classico incastonato in un palazzo.',
+                descrizione_completa: 'Un dettaglio che mostra la stratificazione storica degli edifici di Ostuni, con riutilizzi di elementi antichi.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73059, lng: 17.57570 // COORDINATA CORRETTA
+            },
+            {
+                id: 'convento-monacelle',
+                numero: 3,
+                titolo: 'Convento delle Monacelle',
+                dettaglio: 'Complesso religioso che segna l\'inizio della salita verso la Cattedrale.',
+                descrizione_completa: 'Edificio storico di grande importanza, parte integrante della vita monastica della città nel passato.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73070, lng: 17.57560 // COORDINATA CORRETTA
+            },
+            {
+                id: 'chiesa-museo',
+                numero: 4,
+                titolo: 'Chiesa Monacelle/Museo',
+                dettaglio: 'Area espositiva che include la storia e i reperti della civiltà preclassica.',
+                descrizione_completa: 'Ospita importanti ritrovamenti archeologici come la "Donna di Ostuni", testimoniando l\'antichità del sito.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73078, lng: 17.57550 // COORDINATA CORRETTA
+            },
+            {
+                id: 'volta-federico',
+                numero: 5,
+                titolo: 'Volta di Federico II',
+                dettaglio: 'Suggestivo passaggio coperto nel cuore del centro storico.',
+                descrizione_completa: 'Un elemento architettonico che caratterizza la struttura labirintica di Ostuni e ricorda la dominazione sveva.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73085, lng: 17.57565 // COORDINATA CORRETTA
+            },
+            {
+                id: 'loggia-palazzo',
+                numero: 6,
+                titolo: 'La Loggia e Palazzo Vescovile',
+                dettaglio: 'La loggia che unisce il Seminario al Palazzo del Vescovo (Arco Scoppa).',
+                descrizione_completa: 'Icona di Ostuni, l\'Arco Scoppa incornicia la vista e unisce i due edifici del potere religioso.',
+                immagine: 'arco-scoppa.jpg',
+                audio: 'palazzo-episcopio.mp3',
+                lat: 40.73091, lng: 17.57554 // COORDINATA CORRETTA
+            },
+            {
+                id: 'largo-pappadà',
+                numero: 7,
+                titolo: 'Largo Pappadà',
+                dettaglio: 'Affaccio panoramico sul mare e sulla piana degli ulivi.',
+                descrizione_completa: 'Un punto di sosta essenziale per ammirare il celebre paesaggio ostunese che si estende fino all\'Adriatico.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73080, lng: 17.57500 // COORDINATA CORRETTA
+            },
+            {
+                id: 'chiesa-compostela',
+                numero: 8,
+                titolo: 'Chiesa San G. in Compostela',
+                dettaglio: 'Piccola chiesa ricca di storia, legata ai pellegrini.',
+                descrizione_completa: 'Un gioiello nascosto nei vicoli, testimone delle rotte religiose che attraversavano Ostuni.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73065, lng: 17.57488 // COORDINATA CORRETTA
+            },
+            {
+                id: 'porta-san-demetrio',
+                numero: 9,
+                titolo: 'Porta San Demetrio',
+                dettaglio: 'Antica porta d\'accesso alle mura medievali.',
+                descrizione_completa: 'Una delle uscite originali che permetteva l\'accesso alla campagna circostante, essenziale per la difesa della città.',
+                immagine: 'default-c.jpg',
+                audio: 'default-a.mp3',
+                lat: 40.73035, lng: 17.57500 // COORDINATA CORRETTA
+            },
+            {
+                id: 'porta-nova',
+                numero: 10,
+                titolo: 'Porta Nova e Mura Aragonesi',
+                dettaglio: 'L\'ingresso principale della città vecchia e i resti della fortificazione.',
+                descrizione_completa: "Le mura aragonesi circondavano Ostuni per protezione. Porta Nova è un simbolo dell'architettura difensiva.",
+                immagine: 'mura-aragonesi.jpg',
+                audio: 'mura.mp3',
+                lat: 40.72979, lng: 17.57723 // COORDINATA CORRETTA
+            }
+        ]
+    },
+    
+    // ====================================================================
+    // 4. TOUR: ESTENSIONE COSTIERA (Opzione esterna)
     // ====================================================================
     {
         id: 'costiero',
