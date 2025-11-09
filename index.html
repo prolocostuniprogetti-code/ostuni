@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ostuni Guida Turistica Interattiva</title>
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIINfBIHPZgW1ZefU4MoSA6gDLp3zEhec2Y=" 
+          crossorigin=""/>
     
     <style>
         body {
@@ -80,7 +82,9 @@
     <div id="map">
         </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20n6cT99BfiY7zIFL8/5sa0W4IzASG4FcdWab2kT66F8=" 
+            crossorigin=""></script> 
     
     <script src="./dettagli/data.js"></script>
 
@@ -166,6 +170,9 @@
 
             initMap(); 
             
+            // CORREZIONE SCOMPARSA MAPPA: Forziamo la mappa a ricalcolare le dimensioni e a disegnarsi
+            map.invalidateSize(); 
+
             const tourList = document.getElementById('tour-list');
             
             attrazioni.forEach(tour => {
@@ -175,7 +182,7 @@
                 tourList.appendChild(li);
             });
 
-            // CORREZIONE BUG: Lasciamo la centratura disattivata per evitare il disallineamento
+            // Lasciamo la centratura automatica disattivata per evitare il disallineamento
             // fitMapToAllMarkers(); 
         }
 
