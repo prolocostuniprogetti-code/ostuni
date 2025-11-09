@@ -1,132 +1,286 @@
-// dettagli/data.js
-// Questo file contiene la struttura dei dati (attrazioni) e i contenuti dettagliati (contenutiDettaglio).
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20n6a9c8z8+p4u7s+j8x2e1uA4gH4m9bA4Xv8gD8v4g="
+        crossorigin=""></script>
+        
+    <script src="dettagli/data.js"></script>
+    
+    <script>
+        const detailPanel = document.getElementById('detail-panel');
+        const detailContent = document.getElementById('detail-content');
+        const detailTitleHeader = document.getElementById('detail-title-header');
+        const welcomeCard = document.getElementById('welcome-card');
+        const mapPanel = document.getElementById('map-panel'); 
+        const headerTitle = document.getElementById('header-title');
+        let userName = localStorage.getItem('userName'); 
+        let currentMap = null; 
+        
+        // Funzione di inizializzazione principale
+        function initApp() {
+            // CRITICAL CHECK: Verifica che data.js sia caricato correttamente
+            if (typeof attrazioni === 'undefined') {
+                console.error("ERRORE: Variabile 'attrazioni' non trovata. Controlla il nome del file 'dettagli/data.js'.");
+                document.getElementById('main-content').innerHTML = `
+                    <div class="p-6 bg-red-100 border-l-4 border-red-500 text-red-700 font-bold rounded-lg">
+                        ERRORE CRITICO: File dati non trovato. Assicurati che il file nella cartella 'dettagli/' si chiami ESATTAMENTE 'data.js'.
+                    </div>
+                `;
+                return;
+            }
 
-// 1. Array degli itinerari con Dettagli e Coordinate GPS
-const attrazioni = [
-    {
-        id: 'barocco',
-        nome: '1. Barocco & Sacro',
-        descrizione: 'Esplora i capolavori barocchi e i luoghi di culto più significativi del centro storico. Durata stimata: 2 ore.',
-        elementi: [
-            // TUTTI GLI ELEMENTI DEVONO AVERE lat e lng PER LA MAPPA
-            { id: 'obelisco', numero: 1, titolo: 'Obelisco di S. Oronzo', dettaglio: 'Monumento votivo barocco, punto di partenza ideale.', lat: 40.7301, lng: 17.5755 },
-            { id: 'cattedrale', numero: 2, titolo: 'Cattedrale', dettaglio: 'Il simbolo di Ostuni, famosa per il suo maestoso rosone.', lat: 40.7297, lng: 17.5768 },
-            { id: 'spiritosanto', numero: 3, titolo: 'Chiesa dello Spirito Santo', dettaglio: 'Una delle chiese più antiche, con portale rinascimentale.', lat: 40.7313, lng: 17.5760 },
-            { id: 'sanfrancesco', numero: 4, titolo: 'Chiesa San F. d\'Assisi', dettaglio: 'Esempio di architettura barocca con elementi medievali.', lat: 40.7310, lng: 17.5745 },
-            { id: 'loggiavescovile', numero: 5, titolo: 'La Loggia, Palazzo Vescovile', dettaglio: 'L\'elegante ponte che collega la Cattedrale al Palazzo.', lat: 40.7299, lng: 17.5767 },
-            { id: 'madonnastella', numero: 6, titolo: 'Chiesa Santa M. della Stella', dettaglio: 'Chiesa dedicata alla Madonna della Stella.', lat: 40.7288, lng: 17.5772 },
-            { id: 'madonnacarmine', numero: 7, titolo: 'Chiesa Madonna del Carmine', dettaglio: 'Una chiesa importante, spesso punto di riferimento nel quartiere.', lat: 40.7305, lng: 17.5750 },
-        ]
-    },
-    {
-        id: 'mura',
-        nome: '2. Mura & Panorami',
-        descrizione: 'Percorso lungo l\'antica cinta muraria aragonese con i migliori punti fotografici sulla Città Bianca e la Piana degli Ulivi. Durata stimata: 1.5 ore.',
-        elementi: [
-            { id: 'portasandemetrio', numero: 1, titolo: 'Porta San Demetrio', dettaglio: 'Una delle antiche porte di accesso al centro storico.', lat: 40.7288, lng: 17.5749 },
-            { id: 'portanova', numero: 2, titolo: 'Porta Nova', dettaglio: 'Porta principale, accesso al borgo antico.', lat: 40.7318, lng: 17.5764 },
-            { id: 'voltafederico', numero: 3, titolo: 'Volta di Federico II', dettaglio: 'Arco storico legato alla presenza dell\'Imperatore.', lat: 40.7295, lng: 17.5770 },
-            { id: 'belvedere', numero: 4, titolo: 'Vista Panoramica Belvedere (Masseria)', dettaglio: 'La vista più classica sul centro storico, perfetta per foto.', lat: 40.7305, lng: 17.5740 },
-            { id: 'largopappada', numero: 5, titolo: 'Largo Pappadà', dettaglio: 'Piazzetta panoramica con vista sulla valle.', lat: 40.7285, lng: 17.5765 },
-        ]
-    },
-    {
-        id: 'sapori',
-        nome: '3. Sapori & Tradizioni',
-        descrizione: 'Scopri i sapori locali: panifici storici, mercati rionali e botteghe artigiane. Durata stimata: 2.5 ore (con pause gusto!).',
-        elementi: [
-            { id: 'piazzaliberta', numero: 1, titolo: 'Piazza della Libertà (Mercato)', dettaglio: 'Cuore pulsante della città, sede del mercato rionale.', lat: 40.7303, lng: 17.5752 },
-            { id: 'palazzomunicipale', numero: 2, titolo: 'Palazzo Municipale', dettaglio: 'Antico convento francescano, sede del Municipio e piazza principale.', lat: 40.7304, lng: 17.5750 },
-            { id: 'fornovechio', numero: 3, titolo: 'Forno Storico "Il Vecchio"', dettaglio: 'Assaggia il tipico pane di Altamura o la focaccia ostunese.', lat: 40.7315, lng: 17.5758 },
-            { id: 'masseriabrancati', numero: 4, titolo: 'Masseria Brancati (Frantoio Ipogeo)', dettaglio: 'Visita un frantoio ipogeo e assaggia l\'olio EVO millenario.', lat: 40.7250, lng: 17.5500 }, 
-            { id: 'osteriamuraglia', numero: 5, titolo: 'Osteria Tipica "La Muraglia"', dettaglio: 'Un luogo per assaporare piatti tradizionali pugliesi.', lat: 40.7290, lng: 17.5763 },
-        ]
-    },
-];
-
-
-// 2. Mappa dei contenuti HTML (La libreria di tutti i contenuti di dettaglio)
-const contenutiDettaglio = {
-    // Obelisco - Contenuto ricco
-    'obelisco': `
-        <div class="relative h-72 w-full overflow-hidden rounded-xl shadow-lg mb-6">
-            <img src="immagini/obelisco.jpg" alt="Colonna Sant'Oronzo Ostuni" class="w-full h-full object-cover">
-        </div>
-        <div class="audio-container flex items-center space-x-3">
-            <svg class="w-6 h-6 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v14m-6 3h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2v6a2 2 0 002 2zm0 0H5a2 2 0 01-2-2v-6a2 2 0 012-2h12"></path></svg>
-            <span class="font-medium text-gray-700 flex-shrink-0">Ascolta la Guida:</span>
-            <audio controls class="flex-grow">
-                <source src="immagini/obelisco.mp3" type="audio/mpeg"> 
-                Il tuo browser non supporta l'elemento audio.
-            </audio>
-        </div>
-        <div class="prose max-w-none text-lg leading-relaxed text-gray-700">
-            <h1 class="text-3xl font-bold mb-3">Obelisco di S. Oronzo</h1>
-            <p>L'Obelisco di Sant'Oronzo, eretto tra il 1771 e il 1773 su progetto del maestro artigiano <strong>Giuseppe Greco</strong>, è un maestoso monumento votivo in stile Barocco Pugliese, alto circa 21 metri. Simbolo di gratitudine civica nei confronti del Santo Patrono che, secondo la tradizione, salvò Ostuni dalla peste nel 1743. Un vero capolavoro di scultura e ingegneria barocca che domina Piazza della Libertà.</p>
-            <h2 class="text-2xl font-bold mt-6 mb-3 text-blue-700">Significato Storico</h2>
-            <p>Le statue poste sul piedistallo raffigurano vari santi che hanno avuto un ruolo nella protezione della città. L'obelisco non è solo un monumento religioso, ma anche un punto focale storico e sociale, da cui partono tutti gli itinerari principali della città bianca.</p>
-        </div>
-    `,
-    // Cattedrale - Contenuto ricco
-    'cattedrale': `
-        <div class="relative h-72 w-full overflow-hidden rounded-xl shadow-lg mb-6">
-            <img src="immagini/cattedrale.jpg" alt="Facciata della Cattedrale di Ostuni" class="w-full h-full object-cover">
-        </div>
-        <div class="audio-container flex items-center space-x-3">
-            <svg class="w-6 h-6 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v14m-6 3h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2v6a2 2 0 002 2zm0 0H5a2 2 0 01-2-2v-6a2 2 0 012-2h12"></path></svg>
-            <span class="font-medium text-gray-700 flex-shrink-0">Ascolta la Guida:</span>
-            <audio controls class="flex-grow">
-                <source src="immagini/cattedrale.mp3" type="audio/mpeg"> 
-                Il tuo browser non supporta l'elemento audio.
-            </audio>
-        </div>
-        <div class="prose max-w-none text-lg leading-relaxed text-gray-700">
-            <h1 class="text-3xl font-bold mb-3">Cattedrale (Concattedrale di Santa Maria Assunta)</h1>
-            <p>La Concattedrale, posta sul punto più alto del colle, è il fulcro religioso e storico di Ostuni. La sua costruzione fu avviata nel 1435 e completata tra il 1470 e il 1495, presentando un affascinante mix di stili, in particolare il tardo Gotico e il Rinascimento.</p>
-            <h2 class="text-2xl font-bold mt-6 mb-3 text-blue-700">Il Rosone Maestoso</h2>
-            <p>Il punto di maggiore interesse è il suo gigantesco rosone, uno dei più grandi d'Europa, con 24 raggi finemente lavorati che simboleggiano le 24 ore del giorno. La facciata, di forma concava-convessa, conferisce un effetto dinamico e spettacolare, tipico del barocco pur essendo la struttura più antica.</p>
-        </div>
-    `,
-    // Chiesa dello Spirito Santo - Contenuto ricco
-    'spiritosanto': `
-        <div class="relative h-72 w-full overflow-hidden rounded-xl shadow-lg mb-6">
-            <img src="immagini/spiritosanto.jpg" alt="Facciata della Chiesa dello Spirito Santo" class="w-full h-full object-cover">
-        </div>
-        <div class="audio-container flex items-center space-x-3">
-            <svg class="w-6 h-6 text-blue-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v14m-6 3h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2v6a2 2 0 002 2zm0 0H5a2 2 0 01-2-2v-6a2 2 0 012-2h12"></path></svg>
-            <span class="font-medium text-gray-700 flex-shrink-0">Ascolta l'Approfondimento:</span>
-            <audio controls class="flex-grow">
-                <source src="immagini/spiritosanto.mp3" type="audio/mpeg"> 
-                Il tuo browser non supporta l'elemento audio.
-            </audio>
-        </div>
-        <div class="prose max-w-none text-lg leading-relaxed text-gray-700">
-            <h1 class="text-3xl font-bold text-gray-800 mb-3">Chiesa dello Spirito Santo</h1>
+            // Imposta lo stato iniziale
+            renderWelcomeCard();
+            setActiveScreen('home-screen'); 
             
-            <p>La Chiesa dello Spirito Santo è uno degli edifici più antichi e significativi di Ostuni, situata lungo l'antica strada che conduceva fuori città. La sua storia affonda le radici nel **Medioevo**, anche se l'aspetto attuale è il risultato di ricostruzioni e restauri successivi.</p>
+            // Inizializza la sezione itinerari (se 'barocco' esiste in data.js)
+            changeSection('barocco');
+        }
 
-            <h2 class="text-2xl font-bold mt-6 mb-3 text-blue-700">Il Portale Rinascimentale</h2>
-            <p>L'elemento più notevole della chiesa è il suo portale, realizzato in stile **Rinascimentale** nel 1500. Il portale è incorniciato da colonne con capitelli corinzi e presenta un timpano riccamente scolpito. Al centro della lunetta, si trova un bassorilievo raffigurante la **Pentecoste**, ovvero la discesa dello Spirito Santo sugli Apostoli.</p>
-        </div>
-    `,
-    // Contenuti placeholder per le altre attrazioni.
-    'sanfrancesco': `<div class="p-6 text-gray-500">Contenuto per San Francesco non ancora inserito.</div>`,
-    'loggiavescovile': `<div class="p-6 text-gray-500">Contenuto per la Loggia Vescovile non ancora inserito.</div>`,
-    'madonnastella': `<div class="p-6 text-gray-500">Contenuto per Madonna della Stella non ancora inserito.</div>`,
-    'madonnacarmine': `<div class="p-6 text-gray-500">Contenuto per Madonna del Carmine non ancora inserito.</div>`,
-    'portasandemetrio': `<div class="p-6 text-gray-500">Contenuto per Porta San Demetrio non ancora inserito.</div>`,
-    'portanova': `<div class="p-6 text-gray-500">Contenuto per Porta Nova non ancora inserito.</div>`,
-    'voltafederico': `<div class="p-6 text-gray-500">Contenuto per Volta di Federico II non ancora inserito.</div>`,
-    'belvedere': `<div class="p-6 text-gray-500">Contenuto per il Belvedere non ancora inserito.</div>`,
-    'largopappada': `<div class="p-6 text-gray-500">Contenuto per Largo Pappadà non ancora inserito.</div>`,
-    'piazzaliberta': `<div class="p-6 text-gray-500">Contenuto per Piazza della Libertà (Mercato) non ancora inserito.</div>`,
-    'palazzomunicipale': `<div class="p-6 text-gray-500">Contenuto per Palazzo Municipale non ancora inserito.</div>`,
-    'fornovechio': `<div class="p-6 text-gray-500">Contenuto per Forno Storico non ancora inserito.</div>`,
-    'masseriabrancati': `<div class="p-6 text-gray-500">Contenuto per Masseria Brancati non ancora inserito.</div>`,
-    'osteriamuraglia': `<div class="p-6 text-gray-500">Contenuto per Osteria La Muraglia non ancora inserito.</div>`,
-};
+        // --- GESTIONE SCHERMATE ---
+        function setActiveScreen(screenId) {
+            // Nasconde l'overlay della Mappa se attivo
+            mapPanel.classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+        
+            document.querySelectorAll('.app-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
 
-// 3. Funzione per recuperare il contenuto (esposta all'esterno per essere usata in index.html)
-function getAttractionDetail(id) {
-    return contenutiDettaglio[id] || `<div class="p-6 text-red-600">Contenuto per l'attrazione <b>${id}</b> non trovato. Completa il file dettagli/data.js!</div>`;
-}
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`nav-${screenId.split('-')[0]}`).classList.add('active');
+            
+            // Aggiorna il titolo nell'header
+            const titles = {
+                'home-screen': 'Home Dashboard',
+                'bookings-screen': 'Le Tue Prenotazioni',
+                'profile-screen': 'Gestisci Profilo'
+            };
+            headerTitle.textContent = titles[screenId] || 'Tour Guide App';
+            
+            if (screenId === 'profile-screen') {
+                document.getElementById('profile-username').textContent = userName || 'Ospite (Non Registrato)';
+            }
+            
+            window.scrollTo(0, 0);
+        }
+        
+        // --- LOGICA DI LOGIN/REGISTRAZIONE ---
+        function renderWelcomeCard() {
+            userName = localStorage.getItem('userName');
+            if (userName) {
+                welcomeCard.innerHTML = `
+                    <p class="text-lg font-semibold text-gray-800 mb-1">Benvenuto, ${userName}! 👋</p>
+                    <p class="text-sm text-gray-500">Esplora gli itinerari o prenota una guida locale.</p>
+                `;
+            } else {
+                welcomeCard.innerHTML = `
+                    <p class="text-base font-semibold text-gray-800 mb-3">Registrati/Accedi per un'esperienza completa!</p>
+                    <div class="flex space-x-2">
+                        <input id="userNameInput" type="text" placeholder="Inserisci Email (Simulato)" class="flex-grow p-2 border border-gray-300 rounded-lg text-sm focus:ring-[#054D8F] focus:border-[#054D8F]">
+                        <button onclick="registerUser()" class="bg-[#054D8F] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#03376B] transition duration-150 flex-shrink-0">
+                            Accedi/Registrati
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function registerUser() {
+            const inputElement = document.getElementById('userNameInput');
+            const email = inputElement.value.trim();
+            const name = email.split('@')[0];
+
+            if (email && email.includes('@')) {
+                localStorage.setItem('userName', name);
+                userName = name;
+                renderWelcomeCard(); 
+            } else {
+                alert('Inserisci una email valida per la simulazione di accesso!');
+            }
+        }
+        
+        // --- FUNZIONI MAPPA (CORRETTE e Potenziate) ---
+
+        function showMap() {
+             // Nasconde tutte le schermate attive e deseleziona i pulsanti Nav
+            document.querySelectorAll('.app-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+             // Attiva il pulsante Mappa
+            document.getElementById('nav-map').classList.add('active');
+            
+            // Rende il pannello Mappa visibile
+            mapPanel.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Inizializza la mappa se non è ancora stata creata
+            if (!currentMap) {
+                initMap();
+            } 
+            
+            // FIX CRITICO: Forza il ricalcolo delle dimensioni.
+            // Il check `if (currentMap)` ora è esterno all'inizializzazione.
+            if (currentMap) {
+                setTimeout(() => {
+                    // Questa chiamata risolve l'overlay bianco perché forza Leaflet a misurare
+                    // il contenitore DOPO che è stato reso visibile.
+                    currentMap.invalidateSize();
+                }, 10); 
+            }
+        }
+        
+        function hideMap() {
+            mapPanel.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            // Quando nascondiamo la mappa, torniamo alla Home e attiviamo il pulsante corretto
+            setActiveScreen('home-screen'); 
+        }
+        
+        function initMap() {
+            const ostuniCoords = [40.7303, 17.5752];
+
+            currentMap = L.map('map').setView(ostuniCoords, 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(currentMap);
+
+            // Aggiunge i marker (richiede data.js)
+            attrazioni.forEach(section => {
+                section.elementi.forEach(item => {
+                    if (item.lat && item.lng) {
+                        L.marker([item.lat, item.lng])
+                            .addTo(currentMap)
+                            .bindPopup(`
+                                <b>${item.titolo}</b><br>${item.dettaglio}
+                                <br><button onclick="showDetail('${item.id}', { preventDefault: () => {} }); hideMap();" 
+                                    class="bg-[#054D8F] text-white text-xs px-2 py-1 rounded mt-2 hover:bg-[#03376B] transition">
+                                    Vedi Dettaglio
+                                </button>
+                            `);
+                    }
+                });
+            });
+        }
+        
+        // --- FUNZIONI CONTENUTO (Itinerari) ---
+        function changeSection(sectionId) {
+            const sectionData = attrazioni.find(s => s.id === sectionId);
+            const listContainer = document.getElementById('attraction-list');
+            const descriptionContainer = document.getElementById('current-description');
+            
+            // CRITICAL FIX: Controllo se i dati della sezione sono validi per prevenire il crash all'avvio
+            if (!sectionData) {
+                 console.error(`Dati per la sezione '${sectionId}' non trovati. Controlla il tuo data.js.`);
+                 listContainer.innerHTML = `<li><div class="p-4 bg-red-100 rounded-lg text-red-700 font-medium">Impossibile caricare i dettagli dell'itinerario. (Errore nel data.js)</div></li>`;
+                 descriptionContainer.innerHTML = `<strong>Errore Dati:</strong> Sezione non caricata.`;
+                 return; 
+            }
+
+            listContainer.innerHTML = '';
+            descriptionContainer.innerHTML = `<strong>Itinerario ${sectionData.nome}:</strong> ${sectionData.descrizione}`;
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`tab-${sectionId}`).classList.add('active');
+
+            sectionData.elementi.forEach(item => {
+                const listItem = document.createElement('li');
+                
+                listItem.innerHTML = `
+                    <div class="attraction-card">
+                        <a href="#" onclick="showDetail('${item.id}', event)" class="flex justify-between items-center w-full">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-8 h-8 flex items-center justify-center bg-[#054D8F] text-white font-bold rounded-full flex-shrink-0">
+                                    ${item.numero}
+                                </div>
+                                <div>
+                                    <p class="text-base font-semibold text-gray-800 hover:text-[#054D8F] transition duration-150">
+                                        ${item.titolo}
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-0.5">${item.dettaglio}</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-[#054D8F] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                `;
+                listContainer.appendChild(listItem);
+            });
+        }
+        
+        // --- FUNZIONI DETTAGLIO (Migliorate per robustezza) ---
+
+        function showDetail(attractionId, event) {
+            if (event) {
+                event.preventDefault(); 
+            }
+            
+            const detailHTML = getAttractionDetail(attractionId);
+            
+            detailContent.innerHTML = detailHTML;
+            detailTitleHeader.textContent = getAttractionTitle(attractionId);
+            detailPanel.classList.add('active');
+
+            document.body.style.overflow = 'hidden'; 
+            detailPanel.scrollTop = 0; 
+        }
+
+        function hideDetail() {
+            detailPanel.classList.remove('active');
+            document.body.style.overflow = 'auto'; 
+        }
+
+        function getAttractionTitle(id) {
+            if (typeof attrazioni === 'undefined') return 'Dettaglio'; 
+            const allElements = attrazioni.flatMap(s => s.elementi);
+            const item = allElements.find(e => e.id === id);
+            return item ? item.titolo : 'Dettaglio';
+        }
+        
+        function getAttractionDetail(id) {
+            if (typeof attrazioni === 'undefined') return 'Dati non disponibili.'; 
+            const allElements = attrazioni.flatMap(s => s.elementi);
+            const item = allElements.find(e => e.id === id);
+            
+            if (!item) {
+                return '<p class="text-red-500">Dettaglio attrazione non trovato.</p>';
+            }
+
+            // Simula il contenuto del dettaglio con template
+            return `
+                <div class="space-y-6">
+                    <img src="dettagli/immagini/${item.immagine || 'placeholder.jpg'}" alt="${item.titolo}" class="w-full h-auto object-cover rounded-xl shadow-lg">
+                    
+                    <div class="audio-container">
+                        <p class="font-semibold text-orange-700 flex items-center mb-2">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13.5a2.5 2.5 0 01-2.5 2.5H9z"></path></svg>
+                            Audioguida:
+                        </p>
+                        <audio controls class="w-full">
+                            <source src="dettagli/audio/${item.audio || 'placeholder.mp3'}" type="audio/mp3">
+                            Il tuo browser non supporta l'elemento audio.
+                        </audio>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold mb-2 text-[#054D8F]">Descrizione Completa</h3>
+                        <p class="text-gray-700 leading-relaxed">${item.descrizione_completa || item.dettaglio}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm text-gray-600 border-t border-gray-200 pt-4">
+                        <p>📍 Coordinate: ${item.lat ? `${item.lat}, ${item.lng}` : 'N/D'}</p>
+                        <button onclick="alert('Simulazione Navigazione con Google Maps')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-green-600 transition">
+                            Naviga
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
